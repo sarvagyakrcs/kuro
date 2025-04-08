@@ -53,6 +53,7 @@
     "remark-unwrap-images": "^4.0.0",
     "resend": "^4.2.0",
     "shiki": "^0.14.7",
+    "starter-tailwind-ui": ".",
     "tailwind-merge": "^3.0.2",
     "unist-util-visit": "^5.0.0",
     "uuid": "^11.1.0",
