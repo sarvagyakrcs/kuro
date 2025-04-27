@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* @layer base {
+  :root {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 13%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 252 59% 48%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 252 59% 48%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 213 27% 84%;
+    
+    --radius: 0.5rem;
+  }
+} */
+
+@layer base {
+  :root {
+    /* Background and foreground colors - refined dark blue-gray */
+    --background: 220 25% 13%;
+    --foreground: 220 25% 95%;
+
+    /* Card styling - slightly lighter than background for subtle depth */
+    --card: 220 25% 16%;
+    --card-foreground: 220 25% 95%;
+
+    /* Popover styling - matches background for consistency */
+    --popover: 220 25% 13%;
+    --popover-foreground: 220 25% 95%;
+
+    /* Primary colors - professional navy blue */
+    --primary: 215 60% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary colors - subtle contrast with primary */
+    --secondary: 215 25% 25%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted elements - subdued but legible */
+    --muted: 215 25% 25%;
+    --muted-foreground: 220 25% 75%;
+
+    /* Accent colors - slightly brighter than primary for emphasis */
+    --accent: 215 60% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Destructive/error colors - subdued red */
+    --destructive: 0 70% 35%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border, input and ring styling - refined borders */
+    --border: 215 25% 22%;
+    --input: 215 25% 20%;
+    --ring: 215 40% 60%;
+    
+    /* Border radius - slightly reduced for more professional look */
+    --radius: 0.4rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight;
+  }
+  
+  .shimmer-effect {
+    background: linear-gradient(90deg, 
+      rgba(255,255,255,0.03) 0%, 
+      rgba(255,255,255,0.08) 50%,
+      rgba(255,255,255,0.03) 100%);
+    background-size: 1000px 100%;
+    @apply animate-shimmer;
+  }
+  
+  .glass-panel {
+    @apply bg-card/70 backdrop-blur-md border border-white/10;
+  }
+}
