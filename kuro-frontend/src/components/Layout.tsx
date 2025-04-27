@@ -24,7 +24,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -52,7 +52,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           Dashboard
         </Link>
         
-        {isAuthenticated && (
+        {!isLoading && isAuthenticated && (
           <>
             <Link to="/courses"
                   onClick={() => setIsMobileMenuOpen(false)}

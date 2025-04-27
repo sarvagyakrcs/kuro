@@ -1,6 +1,8 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth-context';
 import { config } from '../lib/config';
+import { DashboardSkeleton } from '@/components/ui/LoadingStates';
+import Layout from '@/components/Layout';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,8 +12,13 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    // You could return a loading spinner here
-    return <div>Loading...</div>;
+    return (
+      <Layout>
+        <div className="p-8">
+          <DashboardSkeleton />
+        </div>
+      </Layout>
+    );
   }
 
   if (!isAuthenticated) {

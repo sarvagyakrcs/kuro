@@ -13,14 +13,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const UserButton = () => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, isLoading } = useAuth();
 
   const handleLogout = async () => {
     await logout();
     // Redirect is handled in auth context
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-4 mx-4 mb-4 border border-white/10 rounded-xl bg-white/5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-3 w-16" />
+            </div>
+          </div>
+          <div className="flex gap-1">
+            <Skeleton className="h-8 w-8 rounded-md" />
+            <Skeleton className="h-8 w-8 rounded-md" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -45,7 +66,7 @@ const UserButton = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar className="ring-2 ring-primary/20">
-                  <img src='public/default-profile-pic.png' alt='profile-pic' className='rounded-full' />
+                  <img src='/default-profile-pic.png' alt='profile-pic' className='rounded-full' />
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
