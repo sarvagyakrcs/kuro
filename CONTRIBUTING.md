@@ -28,15 +28,17 @@ git remote add upstream https://github.com/sarvagyakrcs/kuro.git
 cd kuro-frontend && bun install
 cd ../kuro-backend && bun install
 cd ../kuro-marketing && bun install
+cd ../kuro-sockets && bun install
 ```
 
 ## Project Structure
 
-Kuro is divided into three main verticals, each serving a specific purpose:
+Kuro is divided into four main verticals, each serving a specific purpose:
 
 1. Frontend (kuro-frontend)
 2. Backend (kuro-backend)
 3. Marketing Site (kuro-marketing)
+4. WebSocket Server (kuro-sockets)
 
 ## Verticals by Difficulty (Easiest to Hardest) and Current Status
 
@@ -91,7 +93,46 @@ Kuro is divided into three main verticals, each serving a specific purpose:
   bun run dev
   ```
 
-### 3. Backend (Advanced)
+### 3. WebSocket Server (Advanced)
+- **Tech Stack**: TypeScript, Express, WebSocket (ws)
+- **Purpose**: Real-time communication server
+- **Current Status**:
+  - 🚧 Initial setup complete
+  - ❌ WebSocket server implementation pending
+  - ❌ Connection handling needed
+  - ❌ Event system to be implemented
+  - ❌ Integration with other verticals pending
+- **Key Features**:
+  - Real-time bidirectional communication
+  - Connection management
+  - Event handling system
+  - Integration with AI agent
+- **Contribution Needs**:
+  - Implement WebSocket server:
+    - Connection handling
+    - Event system
+    - Message broadcasting
+    - Room management
+  - Create integration points:
+    - AI agent communication
+    - Frontend connections
+    - Backend event handling
+  - Implement security features:
+    - Connection authentication
+    - Rate limiting
+    - Message validation
+  - Add monitoring and logging:
+    - Connection metrics
+    - Performance monitoring
+    - Error tracking
+- **Getting Started**:
+  ```bash
+  cd kuro-sockets
+  bun install
+  bun run dev
+  ```
+
+### 4. Backend (Most Advanced)
 - **Tech Stack**: Hono.js, TypeScript, Vercel
 - **Purpose**: API server and business logic
 - **Current Status**:
@@ -203,6 +244,15 @@ If you need help:
 - Cross-browser compatibility
 - **Current Focus**: Backend integration and real-time features
 
+### Why WebSocket Server is Advanced
+- Complex real-time communication handling
+- Concurrent connection management
+- Message broadcasting and routing
+- State synchronization
+- Performance critical operations
+- Integration with multiple verticals
+- **Current Focus**: Basic WebSocket implementation and integration
+
 ### Why Backend is Most Complex
 - Requires deep understanding of AI systems and agents
 - Complex WebSocket implementation for real-time communication
@@ -274,6 +324,7 @@ If you need help:
    cd kuro-frontend && bun install
    cd ../kuro-backend && bun install
    cd ../kuro-marketing && bun install
+   cd ../kuro-sockets && bun install
    ```
 
 3. **Start the Development Server**
@@ -288,6 +339,10 @@ If you need help:
    
    # For marketing
    cd kuro-marketing
+   bun run dev
+   
+   # For sockets
+   cd kuro-sockets
    bun run dev
    ```
 
