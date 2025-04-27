@@ -22,7 +22,7 @@ git clone https://github.com/yourUsername/kuro.git
 cd kuro
 
 # Add upstream remote
-git remote add upstream https://github.com/yourUsername/kuro.git
+git remote add upstream https://github.com/sarvagyakrcs/kuro.git
 
 # Install dependencies for each vertical
 cd kuro-frontend && bun install
