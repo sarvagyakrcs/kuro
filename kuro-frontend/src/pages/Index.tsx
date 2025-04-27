@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { CardSkeleton } from '@/components/ui/LoadingStates';
 import CourseCard from '@/components/ui/CourseCard';
 import useCourses from '@/hooks/useCourses';
-import { BookOpen, Plus, Sparkles, Trophy, Clock } from 'lucide-react';
+import { BookOpen, Plus, Sparkles, Trophy, Clock, LogIn } from 'lucide-react';
 import Layout from '@/components/Layout';
 
 const Index = () => {
@@ -16,18 +16,20 @@ const Index = () => {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div className="space-y-1">
-            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Your Learning Dashboard</h1>
-            <p className="text-lg text-muted-foreground">Track your progress and continue your learning journey</p>
+            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Welcome to Kuro AI</h1>
+            <p className="text-lg text-muted-foreground">Your intelligent learning platform</p>
           </div>
-          <Link to="/create">
-            <Button className="gap-2 bg-gradient-to-r from-primary/90 to-primary hover:from-primary hover:to-primary/90 shadow-lg shadow-primary/20 transition-all duration-200">
-              <Plus className="h-4 w-4" />
-              Create New Course
-            </Button>
-          </Link>
+          <div className="flex gap-4">
+            <Link to="/login">
+              <Button className="gap-2 bg-gradient-to-r from-primary/90 to-primary hover:from-primary hover:to-primary/90 shadow-lg shadow-primary/20">
+                <LogIn className="h-4 w-4" />
+                Sign In
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        {/* Stats Section */}
+        {/* Features Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <div className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-sm">
             <div className="flex items-center gap-4">
@@ -35,8 +37,8 @@ const Index = () => {
                 <Trophy className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold">12</h3>
-                <p className="text-muted-foreground">Courses Completed</p>
+                <h3 className="text-2xl font-bold">AI-Powered</h3>
+                <p className="text-muted-foreground">Smart Learning Path</p>
               </div>
             </div>
           </div>
@@ -46,8 +48,8 @@ const Index = () => {
                 <Clock className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold">48h</h3>
-                <p className="text-muted-foreground">Learning Time</p>
+                <h3 className="text-2xl font-bold">Flexible</h3>
+                <p className="text-muted-foreground">Learn at Your Pace</p>
               </div>
             </div>
           </div>
@@ -57,105 +59,54 @@ const Index = () => {
                 <Sparkles className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold">95%</h3>
-                <p className="text-muted-foreground">Success Rate</p>
+                <h3 className="text-2xl font-bold">Interactive</h3>
+                <p className="text-muted-foreground">Engaging Content</p>
               </div>
             </div>
           </div>
         </div>
         
-        <div className="space-y-10">
-          {/* Continue Learning Section */}
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold tracking-tight">Continue Learning</h2>
-              <Button variant="ghost" className="text-muted-foreground hover:text-white">View All</Button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {isLoading ? (
-                <>
-                  <CardSkeleton />
-                  <CardSkeleton />
-                  <CardSkeleton />
-                </>
-              ) : courses.length > 0 ? (
-                courses.map(course => (
-                  <CourseCard 
-                    key={course.id}
-                    id={course.id}
-                    title={course.title}
-                    description={course.description}
-                    progress={course.progress}
-                    modules={course.modules}
-                    videos={course.videos}
-                    quizzes={course.quizzes}
-                    imageUrl={course.imageUrl}
-                    isNew={course.isNew}
-                  />
-                ))
-              ) : (
-                <div className="col-span-full">
-                  <div className="flex flex-col items-center justify-center py-16 px-4 border border-dashed border-white/10 rounded-xl bg-white/5 backdrop-blur-sm">
-                    <div className="bg-primary/10 p-4 rounded-full mb-4">
-                      <BookOpen className="h-8 w-8 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-medium mb-2">No courses yet</h3>
-                    <p className="text-muted-foreground text-center max-w-md mb-6">
-                      Create your first AI-generated course to start your learning journey
-                    </p>
-                    <Link to="/create">
-                      <Button className="gap-2 bg-gradient-to-r from-primary/90 to-primary hover:from-primary hover:to-primary/90">
-                        <Plus className="h-4 w-4" />
-                        Create New Course
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-          
-          {/* Recommended Section */}
-          {courses.length > 0 && (
-            <section>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold tracking-tight">Recommended For You</h2>
-                <Button variant="ghost" className="text-muted-foreground hover:text-white">Browse All</Button>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {isLoading ? (
-                  <>
-                    <CardSkeleton />
-                    <CardSkeleton />
-                  </>
-                ) : (
-                  <>
-                    <CourseCard 
-                      id="recommended-1"
-                      title="Advanced Data Visualization"
-                      description="Master cutting-edge techniques for presenting complex data in intuitive ways."
-                      progress={0}
-                      modules={6}
-                      videos={15}
-                      quizzes={4}
-                      imageUrl="https://images.unsplash.com/photo-1543286386-713bdd548da4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1024&q=80"
-                    />
-                    <CourseCard 
-                      id="recommended-2"
-                      title="Ethical AI Development"
-                      description="Learn how to develop and deploy AI systems with ethical considerations at the forefront."
-                      progress={0}
-                      modules={4}
-                      videos={10}
-                      quizzes={3}
-                      imageUrl="https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1024&q=80"
-                    />
-                  </>
-                )}
-              </div>
-            </section>
-          )}
-        </div>
+        {/* Featured Courses Preview */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold tracking-tight">Featured Courses</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <CourseCard 
+              id="preview-1"
+              title="Introduction to AI"
+              description="Learn the fundamentals of Artificial Intelligence and Machine Learning."
+              progress={0}
+              modules={8}
+              videos={24}
+              quizzes={6}
+              imageUrl="https://images.unsplash.com/photo-1677442136019-21780ecad995"
+              isPreview
+            />
+            <CourseCard 
+              id="preview-2"
+              title="Data Science Essentials"
+              description="Master the core concepts of data analysis and visualization."
+              progress={0}
+              modules={6}
+              videos={18}
+              quizzes={4}
+              imageUrl="https://images.unsplash.com/photo-1551288049-bebda4e38f71"
+              isPreview
+            />
+            <CourseCard 
+              id="preview-3"
+              title="Web Development"
+              description="Build modern web applications with the latest technologies."
+              progress={0}
+              modules={10}
+              videos={30}
+              quizzes={8}
+              imageUrl="https://images.unsplash.com/photo-1627398242454-45a1465c2479"
+              isPreview
+            />
+          </div>
+        </section>
       </div>
     </Layout>
   );

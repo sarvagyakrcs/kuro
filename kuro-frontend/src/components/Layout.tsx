@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import BackgroundEffects from './BackgroundEffects';
+import UserButton from './auth/user-button';
+import { useAuth } from '@/lib/auth-context';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,6 +24,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
   
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -49,67 +52,49 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           Dashboard
         </Link>
         
-        <Link to="/courses"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={`flex items-center px-4 py-2.5 rounded-lg text-sm font-medium group transition-all duration-200
-                        ${location.pathname.includes('/course') 
-                          ? 'bg-gradient-to-r from-primary/90 to-primary text-white shadow-lg shadow-primary/20' 
-                          : 'text-muted-foreground hover:bg-white/5 hover:text-white'}
-                        `}>
-          <BookOpen className="h-4 w-4 mr-3" />
-          My Courses
-        </Link>
-        
-        <div className="py-3 px-4">
-          <p className="text-xs font-semibold text-muted-foreground/70 tracking-wider">TOOLS</p>
-        </div>
-        
-        <Link to="/create"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={`flex items-center px-4 py-2.5 rounded-lg text-sm font-medium group transition-all duration-200
-                        ${location.pathname === '/create' 
-                          ? 'bg-gradient-to-r from-primary/90 to-primary text-white shadow-lg shadow-primary/20' 
-                          : 'text-muted-foreground hover:bg-white/5 hover:text-white'}
-                        `}>
-          <Plus className="h-4 w-4 mr-3" />
-          Create Course
-        </Link>
-        
-        <Link to="/notes"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={`flex items-center px-4 py-2.5 rounded-lg text-sm font-medium group transition-all duration-200
-                        ${location.pathname === '/notes' 
-                          ? 'bg-gradient-to-r from-primary/90 to-primary text-white shadow-lg shadow-primary/20' 
-                          : 'text-muted-foreground hover:bg-white/5 hover:text-white'}
-                        `}>
-          <File className="h-4 w-4 mr-3" />
-          My Notes
-        </Link>
+        {isAuthenticated && (
+          <>
+            <Link to="/courses"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center px-4 py-2.5 rounded-lg text-sm font-medium group transition-all duration-200
+                            ${location.pathname.includes('/course') 
+                              ? 'bg-gradient-to-r from-primary/90 to-primary text-white shadow-lg shadow-primary/20' 
+                              : 'text-muted-foreground hover:bg-white/5 hover:text-white'}
+                            `}>
+              <BookOpen className="h-4 w-4 mr-3" />
+              My Courses
+            </Link>
+            
+            <div className="py-3 px-4">
+              <p className="text-xs font-semibold text-muted-foreground/70 tracking-wider">TOOLS</p>
+            </div>
+            
+            <Link to="/create"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center px-4 py-2.5 rounded-lg text-sm font-medium group transition-all duration-200
+                            ${location.pathname === '/create' 
+                              ? 'bg-gradient-to-r from-primary/90 to-primary text-white shadow-lg shadow-primary/20' 
+                              : 'text-muted-foreground hover:bg-white/5 hover:text-white'}
+                            `}>
+              <Plus className="h-4 w-4 mr-3" />
+              Create Course
+            </Link>
+            
+            <Link to="/notes"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center px-4 py-2.5 rounded-lg text-sm font-medium group transition-all duration-200
+                            ${location.pathname === '/notes' 
+                              ? 'bg-gradient-to-r from-primary/90 to-primary text-white shadow-lg shadow-primary/20' 
+                              : 'text-muted-foreground hover:bg-white/5 hover:text-white'}
+                            `}>
+              <File className="h-4 w-4 mr-3" />
+              My Notes
+            </Link>
+          </>
+        )}
       </nav>
       
-      <div className="p-4 mx-4 mb-4 border border-white/10 rounded-xl bg-white/5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Avatar className="ring-2 ring-primary/20">
-              <div className="bg-gradient-to-tr from-primary/80 to-primary rounded-full p-2">
-                <User className="h-5 w-5 text-white" />
-              </div>
-            </Avatar>
-            <div>
-              <p className="text-sm font-medium text-white">John Doe</p>
-              <p className="text-xs text-primary/80 font-medium">Premium Plan</p>
-            </div>
-          </div>
-          <div className="flex gap-1">
-            <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-white">
-              <Bell className="h-4 w-4" />
-            </Button>
-            <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-white">
-              <Settings className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
+      <UserButton />
     </div>
   );
   
