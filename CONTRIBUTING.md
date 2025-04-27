@@ -18,15 +18,16 @@ bun --version
 ### Setting up your fork
 ```bash
 # Fork the repository on GitHub first, then:
-git clone https://github.com/YOUR_USERNAME/kuro.git
+git clone https://github.com/yourUsername/kuro.git
 cd kuro
 
 # Add upstream remote
-git remote add upstream https://github.com/ORIGINAL_OWNER/kuro.git
+git remote add upstream https://github.com/yourUsername/kuro.git
 
-# Install dependencies for all verticals
-cd kuro-backend OR cd kuro-frontend OR cd kuro-marketing
-bun add . # or manually cd into each directory and run 'bun install'
+# Install dependencies for each vertical
+cd kuro-frontend && bun install
+cd ../kuro-backend && bun install
+cd ../kuro-marketing && bun install
 ```
 
 ## Project Structure
@@ -226,7 +227,7 @@ If you need help:
 ### 1. Setting Up Your Development Environment
 
 1. **Fork the Repository**
-   - Visit [Kuro's GitHub repository](https://github.com/ORIGINAL_OWNER/kuro)
+   - Visit [Kuro's GitHub repository](https://github.com/sarvagyakrcs/kuro)
    - Click the "Fork" button in the top-right corner
    - Select your account to create the fork
 
@@ -239,7 +240,7 @@ If you need help:
 3. **Set Up Remotes**
    ```bash
    # Add the upstream repository
-   git remote add upstream https://github.com/ORIGINAL_OWNER/kuro.git
+   git remote add upstream https://github.com/sarvagyakrcs/kuro.git
    
    # Verify remotes
    git remote -v
@@ -269,12 +270,10 @@ If you need help:
 
 2. **Set Up the Development Environment**
    ```bash
-   # Install dependencies for all verticals
-   bun install-all
-   
-   # Or install for specific vertical
-   cd kuro-frontend  # or kuro-backend or kuro-marketing
-   bun install
+   # Install dependencies for each vertical
+   cd kuro-frontend && bun install
+   cd ../kuro-backend && bun install
+   cd ../kuro-marketing && bun install
    ```
 
 3. **Start the Development Server**
