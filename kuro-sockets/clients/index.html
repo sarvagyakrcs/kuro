@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload Client</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .upload-section {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        .upload-section.drag-over {
+            border-color: #4CAF50;
+            background-color: #f0f9f0;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .select-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .select-button:hover {
+            background-color: #45a049;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+
+        #selectedFile {
+            margin-top: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>File Upload Client</h1>
+        
+        <div class="upload-section" id="dropZone">
+            <input type="file" id="fileInput" />
+            <button class="select-button" onclick="document.getElementById('fileInput').click()">
+                Select File
+            </button>
+            <div id="selectedFile"></div>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <div id="progressText">0%</div>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        const CHUNK_SIZE = 64 * 1024; // 64KB chunks
+        let ws = null;
+        let currentFileId = null;
+
+        // Initialize WebSocket connection
+        function connectWebSocket() {
+            ws = new WebSocket('ws://localhost:5000');
+            
+            ws.onopen = () => {
+                console.log('Connected to WebSocket server');
+                showStatus('Connected to server', 'success');
+            };
+
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                handleServerMessage(message);
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                showStatus('Connection error', 'error');
+            };
+
+            ws.onclose = () => {
+                console.log('Disconnected from server');
+                showStatus('Disconnected from server', 'error');
+                // Attempt to reconnect after 5 seconds
+                setTimeout(connectWebSocket, 5000);
+            };
+        }
+
+        // Handle messages from server
+        function handleServerMessage(message) {
+            switch (message.type) {
+                case 'progress':
+                    updateProgress(message.progress);
+                    break;
+                case 'success':
+                    showStatus('File uploaded successfully!', 'success');
+                    resetProgress();
+                    break;
+                case 'error':
+                    showStatus(`Error: ${message.message}`, 'error');
+                    resetProgress();
+                    break;
+            }
+        }
+
+        // File selection handler
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('selectedFile').textContent = `Selected: ${file.name}`;
+                uploadFile(file);
+            }
+        });
+
+        // Drag and drop handlers
+        const dropZone = document.getElementById('dropZone');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                document.getElementById('selectedFile').textContent = `Selected: ${file.name}`;
+                uploadFile(file);
+            }
+        });
+
+        // File upload function
+        async function uploadFile(file) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                showStatus('Not connected to server', 'error');
+                return;
+            }
+
+            currentFileId = `file-${Date.now()}`;
+            const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+            
+            showProgress();
+            updateProgress(0);
+
+            for (let i = 0; i < totalChunks; i++) {
+                const start = i * CHUNK_SIZE;
+                const end = Math.min(start + CHUNK_SIZE, file.size);
+                const chunk = file.slice(start, end);
+                
+                const base64Chunk = await readChunkAsBase64(chunk);
+                
+                const message = {
+                    type: 'file_chunk',
+                    fileId: currentFileId,
+                    filename: file.name,
+                    chunkIndex: i,
+                    totalChunks: totalChunks,
+                    chunk: base64Chunk
+                };
+
+                ws.send(JSON.stringify(message));
+                await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between chunks
+            }
+        }
+
+        // Helper function to read chunk as base64
+        function readChunkAsBase64(chunk) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64String = reader.result.split(',')[1];
+                    resolve(base64String);
+                };
+                reader.onerror = () => reject(reader.error);
+                reader.readAsDataURL(chunk);
+            });
+        }
+
+        // UI update functions
+        function showProgress() {
+            document.getElementById('progressContainer').style.display = 'block';
+        }
+
+        function resetProgress() {
+            setTimeout(() => {
+                document.getElementById('progressContainer').style.display = 'none';
+                document.getElementById('progressBar').style.width = '0%';
+                document.getElementById('progressText').textContent = '0%';
+            }, 2000);
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progressBar').style.width = `${percent}%`;
+            document.getElementById('progressText').textContent = `${percent.toFixed(1)}%`;
+        }
+
+        function showStatus(message, type) {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.className = type;
+            statusElement.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusElement.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Initialize connection
+        connectWebSocket();
+    </script>
+</body>
+</html> 
