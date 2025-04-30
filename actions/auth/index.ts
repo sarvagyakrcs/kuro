@@ -23,27 +23,15 @@ export const signInProvider = async (provider: 'google' | 'github' | 'twitter' |
         if(error instanceof AuthError){
             switch (error.type) {
                 case "CredentialsSignin":
-                    return {
-                        "error" : "Incorrect Username or Password!",
-                        success_status: false
-                    }
+                    throw new Error("Incorrect Username or Password!")
 
                     case "UntrustedHost":
-                        return {
-                            "error" : "Untrusted host",
-                            success_status: false
-                        }
+                        throw new Error("Untrusted host")
                     case "AccessDenied":
-                        return {
-                            "error" : "Please Verify Your Email to Login.",
-                            success_status: false
-                        }
+                        throw new Error("Please Verify Your Email to Login.")
             
                 default:
-                    return {
-                        "error" : "Something Went Wrong!",
-                        success_status: false
-                    }
+                    throw new Error("Something Went Wrong!")
             }
         }
         throw error;

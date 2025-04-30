@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import {Login} from "@/actions/auth";
 import { LoginSchema, LoginSchemaType } from "@/schema/auth/login-schema";
+import toast from "react-hot-toast";
 
 export default function FormSignIn() {
   const {
@@ -27,8 +28,15 @@ export default function FormSignIn() {
   } = useMutation({
     mutationKey: ['register'],
     mutationFn: Login,
+    onMutate: () => {
+      toast.loading("Logging you in", { id: "login" })
+    },
     onSuccess: () => {
       reset();
+      toast("Logged in successfully", { id: "login" })
+    },
+    onError: (error) => {
+      toast(error.message, { id: "login" })
     }
   })
 
