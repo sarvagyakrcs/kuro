@@ -2,7 +2,7 @@
  * Specifies the Project name, can be changed later
  * @type[string]
  */
-export const PROJECT_NAME = "Auth Baby"
+export const PROJECT_NAME = "Kuro"
 
 /**
  * Specifies the Base URL of the project, can be changed later

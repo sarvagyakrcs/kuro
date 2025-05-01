@@ -1,4 +1,4 @@
-import AuthLayout from '@/modules/auth/layout/auth-layout'
+import AuthLayout from '@/layouts/auth/auth-layout'
 import React from 'react'
 
 type Props = {

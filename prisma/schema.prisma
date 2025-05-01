@@ -72,6 +72,81 @@ model User {
   role UserRole @default(USER)
   accounts      Account[]
   sessions      Session[]
+  userCourses UserCourse[]
 
   @@map("users")
 }
+
+model Module {
+  id String @id @default(cuid())
+  name String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  videoUrl String?
+  thumbnailUrl String?
+  moduleType ModuleType @default(VIDEO)
+  quiz Quiz?
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId String
+}
+
+enum ModuleType {
+  VIDEO
+  TEXT
+  CHART
+  MD
+}
+
+model Quiz {
+  id String @id @default(cuid())
+  title String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  moduleId String @unique
+
+  questions Question[]
+}
+
+model Question {
+  id String @id @default(cuid())
+  question String
+  options Option[]
+  correctOptionId String
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId String
+}
+
+model Option {
+  id String @id @default(cuid())
+  option String
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+}
+
+model Course {
+  id String @id @default(cuid())
+  name String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  modules Module[]
+  userCourses UserCourse[]
+}
+
+model UserCourse {
+  id String @id @default(cuid())
+  userId String
+  courseId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+} 

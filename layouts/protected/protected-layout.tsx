@@ -1,3 +1,5 @@
+import SignOutButton from '@/components/auth/sign-out'
+import Logo from '@/components/global/logo'
 import { Avatar } from '@/components/ui/avatar'
 import {
   Dropdown,
@@ -20,6 +22,7 @@ import {
   SidebarSpacer,
 } from '@/components/ui/sidebar'
 import { SidebarLayout } from '@/components/ui/sidebar-layout'
+import { PROJECT_NAME } from '@/metadata'
 import {
   ArrowRightStartOnRectangleIcon,
   ChevronDownIcon,
@@ -41,8 +44,27 @@ import {
   Square2StackIcon,
   TicketIcon,
 } from '@heroicons/react/20/solid'
+import { Prisma } from '@prisma/client'
+import { Session } from 'next-auth'
 
-function Example() {
+type Props = {
+  children: React.ReactNode
+  session: Session | null
+  courseList: CourseListForSidebar[]
+}
+
+type CourseListForSidebar = Prisma.UserCourseGetPayload<{
+  include: {
+    course: {
+      select: {
+        name: true,
+        description: true,
+      }
+    }
+  }
+}>
+
+export default function ProtectedLayout({ children, session, courseList }: Props) {
   return (
     <SidebarLayout
       navbar={
@@ -90,33 +112,7 @@ function Example() {
       sidebar={
         <Sidebar>
           <SidebarHeader>
-            <Dropdown>
-              <DropdownButton as={SidebarItem} className="lg:mb-2.5">
-                <Avatar src="/tailwind-logo.svg" />
-                <SidebarLabel>Tailwind Labs</SidebarLabel>
-                <ChevronDownIcon />
-              </DropdownButton>
-              <DropdownMenu className="min-w-80 lg:min-w-64" anchor="bottom start">
-                <DropdownItem href="/teams/1/settings">
-                  <Cog8ToothIcon />
-                  <DropdownLabel>Settings</DropdownLabel>
-                </DropdownItem>
-                <DropdownDivider />
-                <DropdownItem href="/teams/1">
-                  <Avatar slot="icon" src="/tailwind-logo.svg" />
-                  <DropdownLabel>Tailwind Labs</DropdownLabel>
-                </DropdownItem>
-                <DropdownItem href="/teams/2">
-                  <Avatar slot="icon" initials="WC" className="bg-purple-500 text-white" />
-                  <DropdownLabel>Workcation</DropdownLabel>
-                </DropdownItem>
-                <DropdownDivider />
-                <DropdownItem href="/teams/create">
-                  <PlusIcon />
-                  <DropdownLabel>New team&hellip;</DropdownLabel>
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
+            <Logo className='text-lg pb-3'  />
             <SidebarSection className="max-lg:hidden">
               <SidebarItem href="/search">
                 <MagnifyingGlassIcon />
@@ -153,10 +149,21 @@ function Example() {
             </SidebarSection>
             <SidebarSection className="max-lg:hidden">
               <SidebarHeading>Upcoming Events</SidebarHeading>
-              <SidebarItem href="/events/1">Bear Hug: Live in Concert</SidebarItem>
-              <SidebarItem href="/events/2">Viking People</SidebarItem>
-              <SidebarItem href="/events/3">Six Fingers — DJ Set</SidebarItem>
-              <SidebarItem href="/events/4">We All Look The Same</SidebarItem>
+              {
+                courseList.length === 0 && (
+                  <SidebarItem href="/courses/create">
+                    <PlusIcon />
+                    <SidebarLabel>Add a course</SidebarLabel>
+                  </SidebarItem>
+                )
+              }
+              {
+                courseList.map((course) => (
+                  <SidebarItem href={`/courses/${course.id}`}>
+                    {course.course.name}
+                  </SidebarItem>
+                ))
+              }
             </SidebarSection>
             <SidebarSpacer />
             <SidebarSection>
@@ -174,11 +181,11 @@ function Example() {
             <Dropdown>
               <DropdownButton as={SidebarItem}>
                 <span className="flex min-w-0 items-center gap-3">
-                  <Avatar src="/profile-photo.jpg" className="size-10" square alt="" />
+                  <Avatar src={session?.user?.image || "/default-profile-pic.png"} className="size-10" square alt="" />
                   <span className="min-w-0">
-                    <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">Erica</span>
+                    <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">{ session?.user?.name }</span>
                     <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">
-                      erica@example.com
+                      { session?.user?.email }
                     </span>
                   </span>
                 </span>
@@ -203,17 +210,14 @@ function Example() {
                   <DropdownLabel>Share feedback</DropdownLabel>
                 </DropdownItem>
                 <DropdownDivider />
-                <DropdownItem href="/logout">
-                  <ArrowRightStartOnRectangleIcon />
-                  <DropdownLabel>Sign out</DropdownLabel>
-                </DropdownItem>
+                <SignOutButton />
               </DropdownMenu>
             </Dropdown>
           </SidebarFooter>
         </Sidebar>
       }
     >
-      {/* The page content */}
+      { children }
     </SidebarLayout>
   )
 }
