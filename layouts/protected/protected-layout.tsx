@@ -159,7 +159,7 @@ export default function ProtectedLayout({ children, session, courseList }: Props
               }
               {
                 courseList.map((course) => (
-                  <SidebarItem href={`/courses/${course.id}`}>
+                  <SidebarItem key={course.id} href={`/courses/${course.id}`}>
                     {course.course.name}
                   </SidebarItem>
                 ))

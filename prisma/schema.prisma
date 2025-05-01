@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -135,9 +134,12 @@ model Course {
   description String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  outcome String?
+  currentLevel String?
 
   modules Module[]
   userCourses UserCourse[]
+  attachments CourseAttachment[]
 }
 
 model UserCourse {
@@ -147,6 +149,20 @@ model UserCourse {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CourseAttachment {
+  id String @id @default(cuid())
+  name String
+  url String
+  key String
+  contentType String?
+  
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId String
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 } 
