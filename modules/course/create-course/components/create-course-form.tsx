@@ -92,8 +92,6 @@ export default function CourseForm({ courseName }: { courseName: string }) {
 
   function onSubmit(values: FormValues) {
     try {
-      // Debug: Check if we have files
-      console.log("Files before submission:", files);
       if (files) {
         console.log("Number of files:", files.length);
         files.forEach((file, index) => {
@@ -115,16 +113,6 @@ export default function CourseForm({ courseName }: { courseName: string }) {
           formData.append("notes", file);
         });
       }
-
-      // Debug: Log the form data we're submitting
-      console.log("Form data being submitted with fields:", 
-        Array.from(formData.keys()).map(key => ({ 
-          key, 
-          value: key === "notes" ? 
-            `${formData.getAll(key).length} files` : 
-            formData.get(key) 
-        }))
-      );
 
       // Convert FormData to a plain object for the server action
       const formDataObj = {
