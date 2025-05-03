@@ -54,8 +54,8 @@ const Header = ({ session } : {session : Session | null}) => {
             {/* User Account */}
             { session ? <UserButton session={session} /> : 
                 <div className="flex items-center justify-between space-x-4">
-                    <SignInForm type='modal' modalLabel='both' />
-                    <SignUpForm type='modal' modalLabel='both' />
+                    <SignInForm type='modal' modalLabel='text' />
+                    <SignUpForm type='modal' modalLabel='text' />
                 </div>
             }
             

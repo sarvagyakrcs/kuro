@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { IconUser } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import FormSignUp from "../forms/register/form";
+import { PodcastIcon } from "lucide-react";
 
 type Props = {
   type: "form" | "modal";
@@ -21,15 +22,15 @@ const SignUpForm = ({ type, modalLabel }: Props) => {
   if (type === "modal") {
     return (
       <>
-        <Button className={cn(modalLabel === "icon" && "p-2 rounded-full")} type="button" onClick={() => setIsOpen(true)}>
+        <Button color="sky" className={cn(modalLabel === "icon" && "p-2 rounded-full")} type="button" onClick={() => setIsOpen(true)}>
           {
-            modalLabel === "text" ? "Login" :
+            modalLabel === "text" ? "Register" :
             modalLabel === "icon" ? (
-              <IconUser size={20} />
+              <PodcastIcon size={20} />
             ) : (
               <div className="flex items-center gap-2">
                 <IconUser size={20} />
-                Login
+                Register
               </div>
             )
           }
