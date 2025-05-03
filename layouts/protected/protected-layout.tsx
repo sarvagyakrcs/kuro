@@ -3,7 +3,6 @@
 import SignOutButton from '@/components/auth/sign-out'
 import Logo from '@/components/global/logo'
 import { Avatar } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import {
   Dropdown,
   DropdownButton,
@@ -123,7 +122,7 @@ export default function ProtectedLayout({
             </NavbarItem>
             <Dropdown>
               <DropdownButton as={NavbarItem}>
-                <Avatar src="/profile-photo.jpg" square />
+                <Avatar src={session?.user?.image || "/default-profile-pic.png"} square />
               </DropdownButton>
               <DropdownMenu className="min-w-64" anchor="bottom end">
                 <DropdownItem href="/my-profile">

@@ -13,7 +13,9 @@ const CourseDetailPage = async ({ params }: Props) => {
     const course = await getCourseModules(id)
 
     return (
-        <CourseList modules={course} />
+        <div className="w-full px-0 sm:px-4">
+            <CourseList modules={course} />
+        </div>
     )
 }
 

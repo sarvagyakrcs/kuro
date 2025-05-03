@@ -44,7 +44,9 @@ const Layout = async ({ children }: Props) => {
       numberOfUnreadNotifications={numberOfUnreadNotifications}
     >
       { children }
-      <ThemeToggle />
+      <div className="hidden md:block">
+        <ThemeToggle />
+      </div>
     </ProtectedLayout>
   )
 }
