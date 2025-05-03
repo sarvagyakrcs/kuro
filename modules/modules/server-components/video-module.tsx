@@ -75,8 +75,8 @@ const VideoFinder = async ({ module }: Props) => {
 
     // If we have a video URL, update the module using the server action
     if (videoUrl) {
-      // Make sure we don't await the server action here to avoid revalidation in render
-      updateModuleVideo(module.id, videoUrl)
+      // Update the module in the database but don't revalidate during render
+      const result = await updateModuleVideo(module.id, videoUrl)
     }
     
     // Return the module with the updated video URL
