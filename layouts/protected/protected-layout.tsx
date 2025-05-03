@@ -1,3 +1,5 @@
+"use client"
+
 import SignOutButton from '@/components/auth/sign-out'
 import Logo from '@/components/global/logo'
 import { Avatar } from '@/components/ui/avatar'
@@ -23,8 +25,6 @@ import {
   SidebarSpacer,
 } from '@/components/ui/sidebar'
 import { SidebarLayout } from '@/components/ui/sidebar-layout'
-import { prisma } from '@/lib/db/prisma'
-import { PROJECT_NAME } from '@/metadata'
 import {
   ArrowRightStartOnRectangleIcon,
   ChevronDownIcon,
@@ -48,12 +48,16 @@ import {
 } from '@heroicons/react/20/solid'
 import { Prisma } from '@prisma/client'
 import { Session } from 'next-auth'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 type Props = {
   children: React.ReactNode
   session: Session | null
   courseList: CourseListForSidebar[]
   numberOfUnreadNotifications: number
+  currentPath?: string
+  currentCourseId?: string
 }
 
 type CourseListForSidebar = Prisma.UserCourseGetPayload<{
@@ -67,7 +71,35 @@ type CourseListForSidebar = Prisma.UserCourseGetPayload<{
   }
 }>
 
-export default function ProtectedLayout({ children, session, courseList, numberOfUnreadNotifications }: Props) {
+export default function ProtectedLayout({ 
+  children, 
+  session, 
+  courseList, 
+  numberOfUnreadNotifications,
+  currentPath = '',
+  currentCourseId = ''
+}: Props) {
+  // Get current pathname for highlighting active items
+  const pathname = usePathname() || currentPath
+  
+  // Extract course ID from pathname if not provided
+  const [activeCourseId, setActiveCourseId] = useState(currentCourseId)
+  
+  useEffect(() => {
+    if (pathname) {
+      const match = pathname.match(/\/courses\/([^\/]+)/)
+      if (match && match[1]) {
+        setActiveCourseId(match[1])
+      }
+    }
+  }, [pathname])
+  
+  // Helper function to check if a path is active
+  const isActive = (path: string) => {
+    if (!pathname) return false
+    return pathname === path || pathname.startsWith(`${path}/`)
+  }
+  
   return (
     <SidebarLayout
       navbar={
@@ -75,9 +107,11 @@ export default function ProtectedLayout({ children, session, courseList, numberO
           <NavbarSpacer />
           <NavbarSection>
             <NavbarItem href="/search" aria-label="Search">
+              {isActive('/search') && <span className="absolute inset-x-2 -bottom-2.5 h-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
               <MagnifyingGlassIcon />
             </NavbarItem>
             <NavbarItem href="/inbox" aria-label="Inbox">
+              {isActive('/inbox') && <span className="absolute inset-x-2 -bottom-2.5 h-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
               <InboxIcon />
             </NavbarItem>
             <Dropdown>
@@ -118,10 +152,12 @@ export default function ProtectedLayout({ children, session, courseList, numberO
             <Logo className='text-lg pb-3'  />
             <SidebarSection className="max-lg:hidden">
               <SidebarItem href="/search">
+                {isActive('/search') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
                 <MagnifyingGlassIcon />
                 <SidebarLabel>Search</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/notifications">
+                {isActive('/notifications') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
                 <InboxIcon />
                 <SidebarLabel>Notifications</SidebarLabel>
                 {numberOfUnreadNotifications > 0 && (
@@ -135,22 +171,27 @@ export default function ProtectedLayout({ children, session, courseList, numberO
           <SidebarBody>
             <SidebarSection>
               <SidebarItem href="/">
+                {pathname === '/' && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
                 <HomeIcon />
                 <SidebarLabel>Home</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/events">
+                {isActive('/events') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
                 <Square2StackIcon />
                 <SidebarLabel>Events</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/orders">
+                {isActive('/orders') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
                 <TicketIcon />
                 <SidebarLabel>Orders</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/settings">
+                {isActive('/settings') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
                 <Cog6ToothIcon />
                 <SidebarLabel>Settings</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/broadcasts">
+                {isActive('/broadcasts') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
                 <MegaphoneIcon />
                 <SidebarLabel>Broadcasts</SidebarLabel>
               </SidebarItem>
@@ -160,6 +201,7 @@ export default function ProtectedLayout({ children, session, courseList, numberO
               {
                 courseList.length === 0 && (
                   <SidebarItem href="/courses/create">
+                    {isActive('/courses/create') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
                     <PlusIcon />
                     <SidebarLabel>Add a course</SidebarLabel>
                   </SidebarItem>
@@ -167,7 +209,13 @@ export default function ProtectedLayout({ children, session, courseList, numberO
               }
               {
                 courseList.map((course) => (
-                  <SidebarItem key={course.id} href={`/courses/${course.courseId}`}>
+                  <SidebarItem 
+                    key={course.id} 
+                    href={`/courses/${course.courseId}`}
+                  >
+                    {activeCourseId === course.courseId && (
+                      <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />
+                    )}
                     {course.course.name}
                   </SidebarItem>
                 ))
@@ -176,10 +224,12 @@ export default function ProtectedLayout({ children, session, courseList, numberO
             <SidebarSpacer />
             <SidebarSection>
               <SidebarItem href="/support">
+                {isActive('/support') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
                 <QuestionMarkCircleIcon />
                 <SidebarLabel>Support</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/changelog">
+                {isActive('/changelog') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
                 <SparklesIcon />
                 <SidebarLabel>Changelog</SidebarLabel>
               </SidebarItem>

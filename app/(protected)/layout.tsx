@@ -11,6 +11,7 @@ type Props = {
 
 const Layout = async ({ children }: Props) => {
   const session = await auth();
+  
   const courseList = await prisma.userCourse.findMany({
     where: {
       userId: session?.user.id
