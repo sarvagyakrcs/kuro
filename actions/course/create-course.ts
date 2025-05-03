@@ -11,7 +11,7 @@ import { uploadModulesToDBEvent } from "@/lib/events/course/create-course/upload
 import { z } from "zod";
 import { createCourseSchema } from "@/schema/course/create-course-schema";
 import { sendNotificationEvent } from "@/lib/events/course/create-course/send-notification";
-import { embedSingleFile } from "@/lib/events/course/create-course/embed-notes";
+import { embedSingleFile, embedMultipleChunks } from "@/lib/events/course/create-course/embed-notes";
 
 // steps : 
 // 1. authenticate the user
@@ -51,19 +51,20 @@ export async function createCourseEntry(formData: z.infer<typeof createCourseSch
             // First upload the notes to create the CourseAttachment records
             const attachments = await uploadNotesFn({ notes: formData.notes, courseId: course.id, userId: user.id });
             
-            // Then process embeddings for each attachment
+            // Process embeddings for each attachment in parallel
             if (attachments && attachments.length > 0) {
-                for (const attachment of attachments) {
-                    try {
-                        // Only embed the first file for now
-                        const {filePath, deleteFile} = await embedSingleFile(formData.notes[0], attachment.id);
-                        console.log(`Embedded file ${attachment.name} at ${filePath}`);
-                        // Clean up temporary files
-                        await deleteFile();
-                    } catch (error) {
-                        console.error(`Error embedding file ${attachment.name}:`, error);
-                    }
-                }
+                await Promise.all(
+                    attachments.map(async (attachment: { id: string; name: string; url: string; fileKey: string; contentType: string }, index: number) => {
+                        try {
+                            const { filePath, deleteFile } = await embedMultipleChunks(formData.notes[index], attachment.id);
+                            console.log(`Embedded file ${attachment.name} at ${filePath}`);
+                            // Clean up temporary files
+                            await deleteFile();
+                        } catch (error) {
+                            console.error(`Error embedding file ${attachment.name}:`, error);
+                        }
+                    })
+                );
             }
             
             return attachments;
@@ -104,10 +105,10 @@ export async function createCourseEntry(formData: z.infer<typeof createCourseSch
         adjList.set(authEvent, [validateDataEvent]);
         adjList.set(validateDataEvent, [createDbCourseEvent]);
         adjList.set(createDbCourseEvent, [createUserCourseEvent, uploadNotesEvent, createAiModulesEvent]);
-        adjList.set(createUserCourseEvent, [sendNotificationEvent]);
+        adjList.set(createUserCourseEvent, []);
         adjList.set(uploadNotesEvent, []);
-        adjList.set(createAiModulesEvent, [uploadModulesToDBEvent, sendNotificationEvent]);
-        adjList.set(uploadModulesToDBEvent, []);
+        adjList.set(createAiModulesEvent, [uploadModulesToDBEvent]);
+        adjList.set(uploadModulesToDBEvent, [sendNotificationEvent]);
         adjList.set(sendNotificationEvent, []);
 
         // Create and run the orchestrator

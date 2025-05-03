@@ -11,10 +11,10 @@ type Props = {
 
 const Layout = async ({ children }: Props) => {
   const session = await auth();
-  
+    
   const courseList = await prisma.userCourse.findMany({
     where: {
-      userId: session?.user.id
+      userId: session?.user?.id
     },
     include: {
       course: {
@@ -29,7 +29,7 @@ const Layout = async ({ children }: Props) => {
       createdAt: 'desc'
     }
   })
-
+  
   const numberOfUnreadNotifications = await prisma.notification.count({
     where: {
       userId: session?.user?.id,
