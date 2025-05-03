@@ -183,7 +183,7 @@ export const embedMultipleChunks = async (file: File, attachmentId: string) => {
         // Generate summary (using the first chunk)
         let summary = "";
         try {
-            const summaryResult = await generateText({
+            const { text, finishReason, usage } = await generateText({
                 model: groq('qwen-qwq-32b'),
                 providerOptions: {
                     groq: { reasoningFormat: 'parsed' },
@@ -192,7 +192,7 @@ export const embedMultipleChunks = async (file: File, attachmentId: string) => {
                 maxTokens: 300,
             });
             
-            summary = summaryResult.toString();
+            summary = text.toString();
             console.log(`Generated summary: ${summary.substring(0, 100)}...`);
         } catch (error) {
             console.error("Error generating summary:", error);

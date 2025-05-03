@@ -141,7 +141,7 @@ const CourseList = ({ modules }: Props) => {
                     whileTap={{ scale: 0.95 }}
                     className="group/btn relative"
                   >
-                    <Button color='sky' className="relative rounded-full w-full sm:w-auto px-4 py-2 text-sm sm:text-base">
+                    <Button href={`/modules/${module.id}`} color='sky' className="relative rounded-full w-full sm:w-auto px-4 py-2 text-sm sm:text-base">
                       <span className="flex items-center justify-center gap-1.5">
                         Open <ChevronRight size={16} className="transition-transform duration-300 group-hover/btn:translate-x-1" />
                       </span>

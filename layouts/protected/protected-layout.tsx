@@ -70,20 +70,20 @@ type CourseListForSidebar = Prisma.UserCourseGetPayload<{
   }
 }>
 
-export default function ProtectedLayout({ 
-  children, 
-  session, 
-  courseList, 
+export default function ProtectedLayout({
+  children,
+  session,
+  courseList,
   numberOfUnreadNotifications,
   currentPath = '',
   currentCourseId = ''
 }: Props) {
   // Get current pathname for highlighting active items
   const pathname = usePathname() || currentPath
-  
+
   // Extract course ID from pathname if not provided
   const [activeCourseId, setActiveCourseId] = useState(currentCourseId)
-  
+
   useEffect(() => {
     if (pathname) {
       const match = pathname.match(/\/courses\/([^\/]+)/)
@@ -92,13 +92,13 @@ export default function ProtectedLayout({
       }
     }
   }, [pathname])
-  
+
   // Helper function to check if a path is active
   const isActive = (path: string) => {
     if (!pathname) return false
     return pathname === path || pathname.startsWith(`${path}/`)
   }
-  
+
   return (
     <SidebarLayout
       navbar={
@@ -155,7 +155,7 @@ export default function ProtectedLayout({
       sidebar={
         <Sidebar>
           <SidebarHeader>
-            <Logo className='text-lg pb-3'  />
+            <Logo className='text-lg pb-3' />
             <SidebarSection className="max-lg:hidden">
               <SidebarItem href="/search">
                 {isActive('/search') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
@@ -207,18 +207,9 @@ export default function ProtectedLayout({
             <SidebarSection className="max-lg:hidden">
               <SidebarHeading>Upcoming Events</SidebarHeading>
               {
-                courseList.length === 0 && (
-                  <SidebarItem href="/courses/create">
-                    {isActive('/courses/create') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
-                    <PlusIcon />
-                    <SidebarLabel>Add a course</SidebarLabel>
-                  </SidebarItem>
-                )
-              }
-              {
                 courseList.map((course) => (
-                  <SidebarItem 
-                    key={course.id} 
+                  <SidebarItem
+                    key={course.id}
                     href={`/courses/${course.courseId}`}
                   >
                     {activeCourseId === course.courseId && (
@@ -228,6 +219,11 @@ export default function ProtectedLayout({
                   </SidebarItem>
                 ))
               }
+              <SidebarItem href="/courses/create">
+                {isActive('/courses/create') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
+                <PlusIcon />
+                <SidebarLabel>Add a course</SidebarLabel>
+              </SidebarItem>
             </SidebarSection>
             <SidebarSpacer />
             <SidebarSection>
@@ -249,9 +245,9 @@ export default function ProtectedLayout({
                 <span className="flex min-w-0 items-center gap-3">
                   <Avatar src={session?.user?.image || "/default-profile-pic.png"} className="size-10" square alt="" />
                   <span className="min-w-0">
-                    <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">{ session?.user?.name }</span>
+                    <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">{session?.user?.name}</span>
                     <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">
-                      { session?.user?.email }
+                      {session?.user?.email}
                     </span>
                   </span>
                 </span>
@@ -283,7 +279,7 @@ export default function ProtectedLayout({
         </Sidebar>
       }
     >
-      { children }
+      {children}
     </SidebarLayout>
   )
 }

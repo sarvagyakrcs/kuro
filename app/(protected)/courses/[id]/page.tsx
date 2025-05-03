@@ -1,4 +1,5 @@
 import { getCourseModules } from '@/actions/course/get-course-modules'
+import { SomethingWentWrongPage } from '@/components/global/something-went-wrong-page'
 import CourseList from '@/modules/course/course-detail/components/course-list'
 import React from 'react'
 
@@ -11,6 +12,10 @@ type Props = {
 const CourseDetailPage = async ({ params }: Props) => {
     const { id } = await params;
     const course = await getCourseModules(id)
+
+    if(!course){
+        return <SomethingWentWrongPage />
+    }
 
     return (
         <div className="w-full px-0 sm:px-4">
