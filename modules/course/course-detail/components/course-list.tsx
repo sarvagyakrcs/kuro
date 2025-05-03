@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Text, Strong } from '@/components/ui/text'
 import { Divider } from '@/components/ui/divider'
 import { SparkleIcon } from '@/components/ui/sparkle-icon'
-import { ExternalLink, Play, Clock, FileText, CheckCircle2, BookOpen, ChevronRight, BarChart2 } from 'lucide-react'
+import { Play, Clock, FileText, CheckCircle2, BookOpen, ChevronRight, BarChart2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 type Props = {

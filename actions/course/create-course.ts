@@ -11,6 +11,7 @@ import { uploadModulesToDBEvent } from "@/lib/events/course/create-course/upload
 import { z } from "zod";
 import { createCourseSchema } from "@/schema/course/create-course-schema";
 import { sendNotificationEvent } from "@/lib/events/course/create-course/send-notification";
+import { embedSingleFile } from "@/lib/events/course/create-course/embed-notes";
 
 // steps : 
 // 1. authenticate the user
@@ -18,6 +19,7 @@ import { sendNotificationEvent } from "@/lib/events/course/create-course/send-no
 // 3. create the course
 // 4. create the userCourse
 // 5. upload the notes
+// 6. embed the notes in parallel with uploading the notes, create dynamic nodes based on number of notes and process in parallel
 // 6. create ai modules (parallel with uploading the notes)
 // 7. upload the modules to the database
 // 8. send a notification to the user
@@ -46,6 +48,9 @@ export async function createCourseEntry(formData: z.infer<typeof createCourseSch
         uploadNotesEvent.task = async () => {
             const user = authEvent.result;
             const course = createDbCourseEvent.result;
+            const {filePath, deleteFile} = await embedSingleFile(formData.notes[0], course.id);
+            console.log(filePath);  
+            deleteFile();
             return await uploadNotesFn({ notes: formData.notes, courseId: course.id, userId: user.id });
         };
 

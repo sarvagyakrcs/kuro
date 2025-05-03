@@ -1,10 +1,12 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
+  extensions = [vector]
 }
 
 model Account {
@@ -164,6 +166,9 @@ model CourseAttachment {
   
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId String
+
+  summaryEmbedding Unsupported("vector(768)")?
+  summary String?
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
