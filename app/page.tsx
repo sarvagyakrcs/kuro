@@ -1,15 +1,23 @@
-import { auth } from "@/auth";
-import { ThemeToggle } from "@/components/global/mode-toggle";
-// import SignInForm from "@/modules/auth/components/sign-in-component";
-import SignUpForm from "@/modules/auth/components/sign-up-component";
 
-export default async function Page() {
+import { auth } from '@/auth'
+import Footer from '@/modules/landing-page/components/footer';
+import LandinPageHero from '@/modules/landing-page/components/hero';
+import PricingPage from '@/modules/landing-page/components/pricing';
+
+const navigation = [
+  { name: 'Platform', href: '#' },
+  { name: 'Learning Paths', href: '#' },
+  { name: 'Success Stories', href: '#' },
+  { name: 'For Educators', href: '#' },
+]
+
+export default async function Example() {
   const session = await auth();
   return (
-    <div className="flex h-screen items-center justify-center w-screen gap-3">
-      <ThemeToggle />
-      <SignUpForm type="modal" modalLabel="icon" />
-      {/* <SignInForm type="modal" modalLabel="icon" session={session} authenticated="user-button" /> */}
-    </div>
+    <main className='grainy'>
+      <LandinPageHero session={session} />
+      <PricingPage />
+      <Footer />
+    </main>
   )
 }
