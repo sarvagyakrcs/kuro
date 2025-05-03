@@ -122,7 +122,6 @@ model Question {
   id              String   @id @default(cuid())
   question        String
   options         Option[]
-  correctOptionId String
   quiz            Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   quizId          String
 }
@@ -132,6 +131,7 @@ model Option {
   option     String
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   questionId String
+  correct    Boolean  @default(false)
 }
 
 model Course {

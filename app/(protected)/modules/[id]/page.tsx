@@ -16,7 +16,7 @@ type Props = {
 const renderModule = (module: Module) => {
     switch(module.moduleType){
         case ModuleType.TEXT:
-            return <TxtModule module={module} />
+            return <MdModule module={module} />
         case ModuleType.VIDEO:
             return <VideoModule module={module} />
         case ModuleType.QUIZ:
@@ -39,7 +39,9 @@ const ModulesPage = async ({ params }: Props) => {
     }
 
     return (
-        renderModule(module)
+        <div suppressHydrationWarning>
+            {renderModule(module)}
+        </div>
     )
 }
 

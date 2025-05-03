@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       1 - ("summaryEmbedding" <=> ${embedding}::vector) AS CosineSimilarity
       FROM "CourseAttachment"
       ORDER BY CosineSimilarity DESC
-      LIMIT 2
+      LIMIT 1
     ` as { name: string, url: string, summary: string, CosineSimilarity: number }[];
     
     const context = similarNotes.map(note => note.summary).join("\n\n");
