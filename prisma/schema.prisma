@@ -1,12 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
   extensions = [vector]
 }
 
@@ -30,20 +30,20 @@ model Account {
 }
 
 model VerificationToken {
-  id String @id @default(cuid())
-  email String 
-  token      String @unique
-  expires    DateTime
- 
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
   @@unique([email, token])
 }
 
 model PasswordResetToken {
-  id String @id @default(cuid())
-  email String 
-  token      String @unique
-  expires    DateTime
- 
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
   @@unique([email, token])
 }
 
@@ -57,42 +57,42 @@ model Session {
   @@map("sessions")
 }
 
-enum UserRole{
+enum UserRole {
   ADMIN
   USER
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name String?
-  email         String?   @unique
-  emailVerified DateTime? @map("email_verified")
-  firstName    String?
-  lastName     String?
-  profilePic         String?
+  id            String         @id @default(cuid())
+  name          String?
+  email         String?        @unique
+  emailVerified DateTime?      @map("email_verified")
+  firstName     String?
+  lastName      String?
+  profilePic    String?
   password      String?
-  role UserRole @default(USER)
+  role          UserRole       @default(USER)
   accounts      Account[]
   sessions      Session[]
-  userCourses UserCourse[]
+  userCourses   UserCourse[]
   notifications Notification[]
 
   @@map("users")
 }
 
 model Module {
-  id String @id @default(cuid())
-  name String
+  id          String   @id @default(cuid())
+  name        String
   description String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  videoUrl String?
+  videoUrl     String?
   thumbnailUrl String?
-  moduleType ModuleType @default(VIDEO)
-  quiz Quiz?
+  moduleType   ModuleType @default(VIDEO)
+  quiz         Quiz?
 
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId String
 }
 
@@ -105,75 +105,75 @@ enum ModuleType {
 }
 
 model Quiz {
-  id String @id @default(cuid())
-  title String
+  id          String   @id @default(cuid())
+  title       String
   description String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   moduleId String @unique
 
   questions Question[]
 }
 
 model Question {
-  id String @id @default(cuid())
-  question String
-  options Option[]
+  id              String   @id @default(cuid())
+  question        String
+  options         Option[]
   correctOptionId String
-  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  quizId String
+  quiz            Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId          String
 }
 
 model Option {
-  id String @id @default(cuid())
-  option String
-  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  option     String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   questionId String
 }
 
 model Course {
-  id String @id @default(cuid())
-  name String
-  description String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  outcome String?
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  outcome      String?
   currentLevel String?
 
-  modules Module[]
+  modules     Module[]
   userCourses UserCourse[]
   attachments CourseAttachment[]
 }
 
 model UserCourse {
-  id String @id @default(cuid())
-  userId String
+  id       String @id @default(cuid())
+  userId   String
   courseId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model CourseAttachment {
-  id String @id @default(cuid())
-  name String
-  url String
-  key String
+  id          String  @id @default(cuid())
+  name        String
+  url         String
+  key         String
   contentType String?
-  
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId String
 
   summaryEmbedding Unsupported("vector(768)")?
-  summary String?
-  
+  summary          String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-} 
+}
 
 enum NotificationType {
   CONSTRUCTIVE
@@ -183,19 +183,19 @@ enum NotificationType {
 }
 
 model Notification {
-  id         String           @id @default(cuid())
-  type       NotificationType
-  title      String
-  content    String
-  read       Boolean          @default(false)
-  actionUrl  String?
-  
-  // Relation fields
-  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
+  id        String           @id @default(cuid())
+  type      NotificationType
+  title     String
+  content   String
+  read      Boolean          @default(false)
+  actionUrl String?
 
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
+  // Relation fields
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([read])

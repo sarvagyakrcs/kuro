@@ -1,4 +1,4 @@
-# AI Course Generator
+# Kuro : AI Course Generator
 
 A modern web application for generating and managing AI educational courses, built with Next.js, TypeScript, and Tailwind CSS.
 

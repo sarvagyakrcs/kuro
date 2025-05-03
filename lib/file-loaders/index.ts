@@ -5,6 +5,7 @@ import { extractTextFromTxt } from './txt-loader';
 import { extractTextFromMarkdown } from './markdown-loader';
 import { extractTextFromCsv } from './csv-loader';
 import { extractTextFromDocx } from './docs-loader';
+import { extractTextFromPdf } from './pdf-loader';
 /**
  * Generic function to extract text from various document types based on file extension.
  * 
@@ -22,8 +23,7 @@ export async function extractTextFromDocument(filePath: string): Promise<string>
       
       switch (extension) {
         case '.pdf':
-          // This would require the PDF function from your previous code
-          throw new Error('PDF extraction requires the extractTextFromPdf function');
+          return await extractTextFromPdf(filePath);
         
         case '.docx':
         case '.doc':

@@ -82,6 +82,7 @@
     "unist-util-visit": "^5.0.0",
     "uuid": "^11.1.0",
     "xlsx": "^0.18.5",
+    "youtubei.js": "^13.4.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
