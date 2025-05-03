@@ -3,7 +3,7 @@ import { uploader } from "@/lib/s3";
 import { Event } from "@/models/Event";
 
 const uploadNotes = async ({ notes, courseId, userId } : {notes : any, courseId : string, userId: string}) => {
-    let attachments: { url: string; name: string; fileKey: string; contentType: string }[] = [];
+    let attachments: { id: string; url: string; name: string; fileKey: string; contentType: string }[] = [];
 
         if (notes && Array.isArray(notes)) {
             for (const file of notes) {
@@ -29,6 +29,7 @@ const uploadNotes = async ({ notes, courseId, userId } : {notes : any, courseId 
                         });
 
                         attachments.push({
+                            id: attachment.id,
                             name: file.name,
                             url: uploadResult.publicUrl || fileKey,
                             fileKey,
@@ -40,6 +41,8 @@ const uploadNotes = async ({ notes, courseId, userId } : {notes : any, courseId 
                 }
             }
         }
+        
+        return attachments;
 }
 
 export const uploadNotesEvent = new Event("upload-notes", "Upload Notes", "Upload Notes", uploadNotes);

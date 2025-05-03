@@ -2,57 +2,124 @@ import { prisma } from "@/lib/db/prisma";
 import { embeddingModel } from "@/lib/embedding-model";
 import { extractTextFromDocument } from "@/lib/file-loaders";
 import { uploader } from "@/lib/s3";
-import { embed, embedMany } from "ai";
+import { embed, embedMany, generateText } from "ai";
 import { writeFile, mkdir, rm } from "fs/promises";
 import path from "path";
+import { groq } from "@ai-sdk/groq";
 
-export const embedSingleFile = async (file: File, notesId: string) => {
-    // save locally
-    // embed
-    // save to db
+export const embedSingleFile = async (file: File, attachmentId: string) => {
+    try {
+        // save locally
+        // embed
+        // save to db
 
-    //step 1: save locally
-    const fileKey = uploader.generateUniqueFileKey(file.name, `${file.name}-${Date.now()}`);
-    const uploadsDir = path.resolve(process.cwd(), "uploads");
-    const filePath = path.join(uploadsDir, fileKey);
+        //step 1: save locally
+        const fileKey = uploader.generateUniqueFileKey(file.name, `${file.name}-${Date.now()}`);
+        const uploadsDir = path.resolve(process.cwd(), "uploads");
+        const filePath = path.join(uploadsDir, fileKey);
 
-    const fileDir = path.dirname(filePath);
-    await mkdir(fileDir, { recursive: true });
+        const fileDir = path.dirname(filePath);
+        await mkdir(fileDir, { recursive: true });
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(filePath, buffer);
+        const buffer = Buffer.from(await file.arrayBuffer());
+        await writeFile(filePath, buffer);
 
-    const deleteFile = async () => {
-        try {
-            await rm(fileDir, { recursive: true, force: true });
-            console.log(`Deleted ${fileDir}`);
-        } catch (error) {
-            console.error(`Error deleting ${fileDir}:`, error);
+        const deleteFile = async () => {
+            try {
+                await rm(fileDir, { recursive: true, force: true });
+                console.log(`Deleted ${fileDir}`);
+            } catch (error) {
+                console.error(`Error deleting ${fileDir}:`, error);
+            }
+        };
+
+        //step2 : load the file and split into chunks
+        const chunks: string[] = [];
+        const text = await extractTextFromDocument(filePath);
+        if (!text || text.length === 0) {
+            console.error("No text extracted from document");
+            return { filePath, deleteFile };
         }
-    };
+        
+        // Split into smaller chunks
+        for (let i = 0; i < text.length; i += 8000) {
+            chunks.push(text.substring(i, i + 8000));
+        }
 
-    //step2 : load the file and split into chunks
-    const chunks: string[] = [];
-    const text = await extractTextFromDocument(filePath);
-    for (let i = 0; i < text.length; i += 8000) {
-        chunks.push(text.substring(i, i + 8000));
+        if (chunks.length === 0) {
+            console.error("No chunks created from document");
+            return { filePath, deleteFile };
+        }
+
+        console.log(`Created ${chunks.length} chunks from document`);
+
+        //step 3: check if attachment exists
+        const attachment = await prisma.courseAttachment.findUnique({
+            where: { id: attachmentId }
+        });
+
+        if (!attachment) {
+            console.error(`Attachment with ID ${attachmentId} not found`);
+            return { filePath, deleteFile };
+        }
+
+        //step 4: generate summary with AI
+        let summary = "";
+        try {
+            // Generate a concise summary of the text
+            const summaryResult = await generateText({
+                model: groq('qwen-qwq-32b'),
+                providerOptions: {
+                    groq: { reasoningFormat: 'parsed' },
+                },
+                prompt: `Summarize the following text in about 200 words, focusing on the key points and main ideas:\n\n${chunks[0].substring(0, 4000)}`,
+                maxTokens: 300,
+            });
+            
+            summary = summaryResult.toString();
+            console.log(`Generated summary: ${summary.substring(0, 100)}...`);
+        } catch (error) {
+            console.error("Error generating summary:", error);
+            // Use a portion of the original text as a fallback summary
+            summary = chunks[0].substring(0, 500) + "...";
+        }
+
+        //step 5: embed
+        try {
+            // Generate embeddings for the first chunk
+            const { embeddings } = await embedMany({
+                model: embeddingModel,
+                values: [chunks[0]] // Use only the first chunk for now
+            });
+
+            console.log(`Generated ${embeddings.length} embeddings`);
+
+            if (embeddings.length === 0) {
+                console.error("No embeddings generated");
+                return { filePath, deleteFile };
+            }
+
+            // Save the embedding vector and summary
+            const result = await prisma.$executeRaw`
+                UPDATE "CourseAttachment"
+                SET "summaryEmbedding" = ${embeddings[0]}::vector,
+                    "summary" = ${summary}
+                WHERE "id" = ${attachmentId}
+            `;
+            
+            console.log(`Successfully updated embedding and summary for attachment ${attachmentId}, result: ${result}`);
+            
+        } catch (error) {
+            console.error("Error generating or saving embeddings:", error);
+        }
+        
+        return { filePath, deleteFile };
+    } catch (error) {
+        console.error("Error in embedSingleFile:", error);
+        // Return a dummy object to prevent further errors
+        return { 
+            filePath: "", 
+            deleteFile: async () => { console.log("No file to delete"); } 
+        };
     }
-
-    //step 2: embed
-    const { embeddings } = await embedMany({
-        model: embeddingModel,
-        values: chunks
-    });
-
-    console.log({ embeddings });
-
-    for(let i = 0; i < embeddings.length; i++){
-        await prisma.$executeRaw`
-            UPDATE "CourseAttachment"
-            SET "summaryEmbedding" = ${embeddings[i]}::vector
-            WHERE "id" = ${notesId}
-        `
-    }
-
-    return { filePath, deleteFile };
 }

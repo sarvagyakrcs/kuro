@@ -1,7 +1,7 @@
 "use client";
 import { newVerification } from "@/actions/auth";
 import CodeBlock from "@/components/global/code-block";
-import { Logo } from "@/components/global/logo";
+import Logo from "@/components/global/logo";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/link";
 import { PROJECT_NAME } from "@/metadata";
@@ -44,7 +44,7 @@ export default function NewVerficationForm() {
         <div className="px-6 lg:px-0 lg:pt-4">
           <div className="mx-auto max-w-2xl">
             <div className="max-w-lg">
-              <Logo height={50} />
+              <Logo  />
               <div className="mt-24 sm:mt-32 lg:mt-16">
                 <Link href="/changelog" className="inline-flex space-x-6">
                   <span className="rounded-full bg-indigo-600/10 px-3 py-1 text-sm/6 font-semibold text-indigo-600 ring-1 ring-indigo-600/10 ring-inset dark:bg-indigo-400/10 dark:text-indigo-400 dark:ring-indigo-400/20">

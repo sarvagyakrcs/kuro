@@ -48,10 +48,25 @@ export async function createCourseEntry(formData: z.infer<typeof createCourseSch
         uploadNotesEvent.task = async () => {
             const user = authEvent.result;
             const course = createDbCourseEvent.result;
-            const {filePath, deleteFile} = await embedSingleFile(formData.notes[0], course.id);
-            console.log(filePath);  
-            deleteFile();
-            return await uploadNotesFn({ notes: formData.notes, courseId: course.id, userId: user.id });
+            // First upload the notes to create the CourseAttachment records
+            const attachments = await uploadNotesFn({ notes: formData.notes, courseId: course.id, userId: user.id });
+            
+            // Then process embeddings for each attachment
+            if (attachments && attachments.length > 0) {
+                for (const attachment of attachments) {
+                    try {
+                        // Only embed the first file for now
+                        const {filePath, deleteFile} = await embedSingleFile(formData.notes[0], attachment.id);
+                        console.log(`Embedded file ${attachment.name} at ${filePath}`);
+                        // Clean up temporary files
+                        await deleteFile();
+                    } catch (error) {
+                        console.error(`Error embedding file ${attachment.name}:`, error);
+                    }
+                }
+            }
+            
+            return attachments;
         };
 
         const createAiModulesFn = createAiModulesEvent.task;
