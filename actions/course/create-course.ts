@@ -10,8 +10,7 @@ import { createAiModulesEvent } from "@/lib/events/course/create-course/create-a
 import { uploadModulesToDBEvent } from "@/lib/events/course/create-course/upload-modules-to-ai";
 import { z } from "zod";
 import { createCourseSchema } from "@/schema/course/create-course-schema";
-import { auth } from "@/auth";
-import { prisma } from "@/lib/db/prisma";
+import { sendNotificationEvent } from "@/lib/events/course/create-course/send-notification";
 
 // steps : 
 // 1. authenticate the user
@@ -21,6 +20,7 @@ import { prisma } from "@/lib/db/prisma";
 // 5. upload the notes
 // 6. create ai modules (parallel with uploading the notes)
 // 7. upload the modules to the database
+// 8. send a notification to the user
 
 export async function createCourseEntry(formData: z.infer<typeof createCourseSchema>) {
     try {
@@ -68,8 +68,15 @@ export async function createCourseEntry(formData: z.infer<typeof createCourseSch
             return await uploadModulesToDBFn({ 
                 aiModules, 
                 courseId: course.id, 
-                userId: user.id 
+                userId: authEvent.result
             });
+        };
+
+        const sendNotificationFn = sendNotificationEvent.task;
+        sendNotificationEvent.task = async () => {
+            const user = authEvent.result;
+            const course = createDbCourseEvent.result;
+            return await sendNotificationFn(user.id, course.name);
         };
 
         // Create the adjacency list for the orchestrator
@@ -77,10 +84,11 @@ export async function createCourseEntry(formData: z.infer<typeof createCourseSch
         adjList.set(authEvent, [validateDataEvent]);
         adjList.set(validateDataEvent, [createDbCourseEvent]);
         adjList.set(createDbCourseEvent, [createUserCourseEvent, uploadNotesEvent, createAiModulesEvent]);
-        adjList.set(createUserCourseEvent, []);
+        adjList.set(createUserCourseEvent, [sendNotificationEvent]);
         adjList.set(uploadNotesEvent, []);
-        adjList.set(createAiModulesEvent, [uploadModulesToDBEvent]);
+        adjList.set(createAiModulesEvent, [uploadModulesToDBEvent, sendNotificationEvent]);
         adjList.set(uploadModulesToDBEvent, []);
+        adjList.set(sendNotificationEvent, []);
 
         // Create and run the orchestrator
         const orchestrator = new EventOrchestrator(adjList);

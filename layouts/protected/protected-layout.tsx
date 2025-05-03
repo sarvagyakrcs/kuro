@@ -1,6 +1,7 @@
 import SignOutButton from '@/components/auth/sign-out'
 import Logo from '@/components/global/logo'
 import { Avatar } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import {
   Dropdown,
   DropdownButton,
@@ -22,6 +23,7 @@ import {
   SidebarSpacer,
 } from '@/components/ui/sidebar'
 import { SidebarLayout } from '@/components/ui/sidebar-layout'
+import { prisma } from '@/lib/db/prisma'
 import { PROJECT_NAME } from '@/metadata'
 import {
   ArrowRightStartOnRectangleIcon,
@@ -51,6 +53,7 @@ type Props = {
   children: React.ReactNode
   session: Session | null
   courseList: CourseListForSidebar[]
+  numberOfUnreadNotifications: number
 }
 
 type CourseListForSidebar = Prisma.UserCourseGetPayload<{
@@ -64,7 +67,7 @@ type CourseListForSidebar = Prisma.UserCourseGetPayload<{
   }
 }>
 
-export default function ProtectedLayout({ children, session, courseList }: Props) {
+export default function ProtectedLayout({ children, session, courseList, numberOfUnreadNotifications }: Props) {
   return (
     <SidebarLayout
       navbar={
@@ -118,9 +121,14 @@ export default function ProtectedLayout({ children, session, courseList }: Props
                 <MagnifyingGlassIcon />
                 <SidebarLabel>Search</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="/inbox">
+              <SidebarItem href="/notifications">
                 <InboxIcon />
-                <SidebarLabel>Inbox</SidebarLabel>
+                <SidebarLabel>Notifications</SidebarLabel>
+                {numberOfUnreadNotifications > 0 && (
+                  <Badge color="emerald" className="ml-2">
+                    {numberOfUnreadNotifications}
+                  </Badge>
+                )}
               </SidebarItem>
             </SidebarSection>
           </SidebarHeader>
@@ -159,7 +167,7 @@ export default function ProtectedLayout({ children, session, courseList }: Props
               }
               {
                 courseList.map((course) => (
-                  <SidebarItem key={course.id} href={`/courses/${course.id}`}>
+                  <SidebarItem key={course.id} href={`/courses/${course.courseId}`}>
                     {course.course.name}
                   </SidebarItem>
                 ))

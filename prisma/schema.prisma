@@ -72,6 +72,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   userCourses UserCourse[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -167,3 +168,29 @@ model CourseAttachment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 } 
+
+enum NotificationType {
+  CONSTRUCTIVE
+  DESTRUCTIVE
+  URGENT
+  INFORMATIVE
+}
+
+model Notification {
+  id         String           @id @default(cuid())
+  type       NotificationType
+  title      String
+  content    String
+  read       Boolean          @default(false)
+  actionUrl  String?
+  
+  // Relation fields
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([read])
+}

@@ -28,11 +28,19 @@ const Layout = async ({ children }: Props) => {
       createdAt: 'desc'
     }
   })
+
+  const numberOfUnreadNotifications = await prisma.notification.count({
+    where: {
+      userId: session?.user?.id,
+      read: false
+    }
+  })
   
   return (
     <ProtectedLayout 
       session={session}
       courseList={courseList}
+      numberOfUnreadNotifications={numberOfUnreadNotifications}
     >
       { children }
       <ThemeToggle />
