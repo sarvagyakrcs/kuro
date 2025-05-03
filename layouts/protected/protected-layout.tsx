@@ -178,8 +178,8 @@ export default function ProtectedLayout({
           </SidebarHeader>
           <SidebarBody>
             <SidebarSection>
-              <SidebarItem href="/">
-                {pathname === '/' && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
+              <SidebarItem href="/home">
+                {pathname === '/home' && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
                 <HomeIcon />
                 <SidebarLabel>Home</SidebarLabel>
               </SidebarItem>
