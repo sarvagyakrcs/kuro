@@ -3,13 +3,11 @@
 import { useCallback, useEffect, useRef } from "react"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import NotificationItem from "./notification-item"
-import NotificationsLoading, { NotificationsLoadingInline } from "./notifications-loading"
+import { NotificationsLoadingInline } from "./notifications-loading"
 import { Divider } from "@/components/ui/divider"
-import { Heading } from "@/components/ui/heading"
 import { Text } from "@/components/ui/text"
 import { Badge } from "@/components/ui/badge"
 import { InboxIcon, RefreshCw } from "lucide-react"
-import { SparkleIcon } from "@/components/ui/sparkle-icon"
 import { motion, AnimatePresence } from "framer-motion"
 import toast from "react-hot-toast"
 import { markAsRead, getNotifications } from "@/actions/notifications"
@@ -23,7 +21,6 @@ export default function NotificationsList() {
 
   const {
     data,
-    isLoading,
     isFetching,
     fetchNextPage,
     hasNextPage,
@@ -86,16 +83,7 @@ export default function NotificationsList() {
   const allNotifications = data?.pages.flatMap(page => page) || []
   const unreadCount = allNotifications.filter(n => !n.read).length
 
-  // Show loading skeleton during initial load
-  if (isLoading) {
-    return <NotificationsLoading />
-  }
-
-  // Show loading skeleton when refetching with no previous data
-  if (isFetching && (!data || data.pages.length === 0)) {
-    return <NotificationsLoading />
-  }
-
+  // If no notifications, show empty state
   if (!allNotifications || allNotifications.length === 0) {
     return <EmptyState />
   }
@@ -133,23 +121,11 @@ export default function NotificationsList() {
 
       <Divider />
 
-      {/* Show a loading bar at the top when refetching with existing data */}
-      {isFetching && !isLoading && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="mx-auto h-0.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800"
-        >
-          <motion.div 
-            className="h-full bg-primary"
-            initial={{ width: "0%" }}
-            animate={{ 
-              width: ["0%", "50%", "70%", "90%"],
-              transition: { duration: 1, ease: "easeInOut" }
-            }}
-          />
-        </motion.div>
+      {/* Show a simple loading bar when refetching */}
+      {isFetching && (
+        <div className="h-0.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+          <div className="h-full w-1/3 bg-primary rounded-full animate-pulse" />
+        </div>
       )}
       
       <div className="grid gap-3">
