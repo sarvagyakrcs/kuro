@@ -66,6 +66,7 @@
     "react-hook-form": "^7.55.0",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
+    "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^15.6.1",
     "recma-import-images": "^0.0.3",
     "rehype-autolink-headings": "^7.1.0",

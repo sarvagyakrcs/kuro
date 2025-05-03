@@ -91,6 +91,7 @@ model Module {
   thumbnailUrl String?
   moduleType   ModuleType @default(VIDEO)
   quiz         Quiz?
+  content      String?
 
   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId String

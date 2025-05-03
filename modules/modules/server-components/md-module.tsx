@@ -1,16 +1,15 @@
+"use server"
 import React from 'react'
 import { Module } from '@prisma/client'
+import MdModuleClient from '../client-components/md-module-client'
 
 type Props = {
   module: Module
 }
 
-const MdModule = ({ module }: Props) => {
+const MdModule = async ({ module }: Props) => {
   return (
-    <div>
-      Md Module
-      <pre>{JSON.stringify(module, null, 2)}</pre>
-    </div>
+    <MdModuleClient module={module} />
   )
 }
 
