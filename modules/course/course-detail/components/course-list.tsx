@@ -47,7 +47,7 @@ const CourseList = ({ modules }: Props) => {
             <SparkleIcon className="mr-1 size-4" />
             <span>Course Content</span>
           </Badge>
-          <Heading className="text-2xl font-bold">Course Modules</Heading>
+          <Heading className="text-xl font-bold">Course Modules</Heading>
           <Text>Complete all {modules.length} modules to finish this course</Text>
         </div>
         <Badge color="zinc" className="rounded-full px-4 py-1.5 text-sm">
@@ -83,7 +83,7 @@ const CourseList = ({ modules }: Props) => {
                 {/* Module number with animated circle */}
                 <div className="relative flex-shrink-0">
                   <div className="flex size-14 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-                    <Strong className="text-xl">{index + 1}</Strong>
+                    <Strong className="text-lg">{index + 1}</Strong>
                     {isHovered && (
                       <motion.div
                         className="absolute inset-0 rounded-full border-2 border-primary/40"
@@ -141,7 +141,7 @@ const CourseList = ({ modules }: Props) => {
                     whileTap={{ scale: 0.95 }}
                     className="group/btn relative"
                   >
-                    <Button className="relative rounded-full px-4 py-2">
+                    <Button color='sky' className="relative rounded-full px-4 py-2">
                       <span className="flex items-center gap-1.5">
                         Open <ChevronRight size={16} className="transition-transform duration-300 group-hover/btn:translate-x-1" />
                       </span>

@@ -110,9 +110,16 @@ export default function ProtectedLayout({
               {isActive('/search') && <span className="absolute inset-x-2 -bottom-2.5 h-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
               <MagnifyingGlassIcon />
             </NavbarItem>
-            <NavbarItem href="/inbox" aria-label="Inbox">
-              {isActive('/inbox') && <span className="absolute inset-x-2 -bottom-2.5 h-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
-              <InboxIcon />
+            <NavbarItem href="/notifications" aria-label="Notifications">
+              {isActive('/notifications') && <span className="absolute inset-x-2 -bottom-2.5 h-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
+              <div className="relative">
+                <InboxIcon />
+                {numberOfUnreadNotifications > 0 && (
+                  <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-xs font-medium text-white">
+                    {numberOfUnreadNotifications}
+                  </span>
+                )}
+              </div>
             </NavbarItem>
             <Dropdown>
               <DropdownButton as={NavbarItem}>
@@ -156,14 +163,16 @@ export default function ProtectedLayout({
                 <MagnifyingGlassIcon />
                 <SidebarLabel>Search</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="/notifications">
+              <SidebarItem href="/notifications" className="relative group">
                 {isActive('/notifications') && <span className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white" />}
                 <InboxIcon />
                 <SidebarLabel>Notifications</SidebarLabel>
                 {numberOfUnreadNotifications > 0 && (
-                  <Badge color="emerald" className="ml-2">
-                    {numberOfUnreadNotifications}
-                  </Badge>
+                  <div className="flex items-center">
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-500 px-1.5 py-0.5 text-xs font-medium text-white transition-all group-hover:bg-emerald-600">
+                      {numberOfUnreadNotifications}
+                    </span>
+                  </div>
                 )}
               </SidebarItem>
             </SidebarSection>

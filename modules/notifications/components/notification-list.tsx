@@ -8,7 +8,7 @@ import { Divider } from "@/components/ui/divider"
 import { Heading } from "@/components/ui/heading"
 import { Text } from "@/components/ui/text"
 import { Badge } from "@/components/ui/badge"
-import { RefreshCw } from "lucide-react"
+import { InboxIcon, RefreshCw } from "lucide-react"
 import { SparkleIcon } from "@/components/ui/sparkle-icon"
 import { motion, AnimatePresence } from "framer-motion"
 import toast from "react-hot-toast"
@@ -100,42 +100,33 @@ export default function NotificationsList() {
     return <EmptyState />
   }
 
-  // Container variants for staggered animations
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <Badge color="blue" className="mb-2">
-            <SparkleIcon className="mr-1 size-4" />
-            <span>Activity</span>
+            <InboxIcon className="mr-1 h-4 w-4" />
+            <span>Notifications</span>
           </Badge>
-          <Heading className="text-2xl font-bold">Your Notifications</Heading>
-          <Text>Stay updated with your latest notifications</Text>
+          <h2 className="text-2xl font-bold tracking-tight">Your Notifications</h2>
+          <Text className="text-zinc-500 dark:text-zinc-400">
+            Stay updated with your latest notifications
+          </Text>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {unreadCount > 0 && (
-            <Badge color="red" className="rounded-full px-4 py-1.5">
-              {unreadCount} unread
+            <Badge color="emerald" className="rounded-full px-3 py-0.5 text-sm">
+              {unreadCount}
             </Badge>
           )}
           <motion.button
             whileHover={{ rotate: 180 }}
             transition={{ duration: 0.5 }}
             onClick={() => refetch()}
-            className="flex size-10 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
             aria-label="Refresh notifications"
           >
-            <RefreshCw className="size-5" />
+            <RefreshCw className="h-4 w-4" />
           </motion.button>
         </div>
       </div>
@@ -145,10 +136,10 @@ export default function NotificationsList() {
       {/* Show a loading bar at the top when refetching with existing data */}
       {isFetching && !isLoading && (
         <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="mx-auto h-1 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="mx-auto h-0.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800"
         >
           <motion.div 
             className="h-full bg-primary"
@@ -161,21 +152,15 @@ export default function NotificationsList() {
         </motion.div>
       )}
       
-      <motion.div 
-        className="grid gap-4"
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-      >
+      <div className="grid gap-3">
         <AnimatePresence>
           {allNotifications.map((notification, index) => (
             <motion.div 
               key={notification.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.2, delay: index * 0.05 }}
             >
               <NotificationItem 
                 notification={notification} 
@@ -184,12 +169,12 @@ export default function NotificationsList() {
             </motion.div>
           ))}
         </AnimatePresence>
-      </motion.div>
+      </div>
 
       {hasNextPage && (
         <div 
           ref={loadMoreRef} 
-          className="mt-4 flex justify-center"
+          className="mt-2 flex justify-center"
         >
           {isFetchingNextPage && <NotificationsLoadingInline />}
         </div>
