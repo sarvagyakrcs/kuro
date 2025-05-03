@@ -31,12 +31,19 @@ export class EventOrchestrator {
 
             await Promise.all(
                 currentBatch.map(async (event) => {
-                    await event.run();
+                    try {
+                        await event.run();
+                    } catch (error) {
+                        console.error(`Error in event ${event.id}:`, error);
+                        // Still consider the event as processed even if it fails
+                    }
 
                     for (const neighbor of this.adjacencyList.get(event) ?? []) {
                         const deg = inDegree.get(neighbor)! - 1;
                         inDegree.set(neighbor, deg);
-                        if (deg === 0) queue.push(neighbor);
+                        if (deg === 0) {
+                            queue.push(neighbor);
+                        }
                     }
                 })
             );

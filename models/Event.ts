@@ -2,11 +2,12 @@ export class Event {
     id: string;
     title: string;
     description: string;
-    task : () => Promise<any>;
+    task: (...args: any[]) => Promise<any>;
     status: "pending" | "running" | "completed" | "failed";
     result: any;
+    error: any;
 
-    constructor(id: string, title: string, description: string, task: () => Promise<any>) {
+    constructor(id: string, title: string, description: string, task: (...args: any[]) => Promise<any>) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -14,15 +15,18 @@ export class Event {
         this.status = "pending";
     }
 
-    async run() {
+    async run(...args: any[]) {
         this.status = "running";
         try {
-            this.result = await this.task();
+            this.result = await this.task(...args);
             this.status = "completed";
+            
+            return this.result;
         } catch (err) {
             this.status = "failed";
-            this.result = err;
+            this.error = err;
+            console.error(`Event failed: ${this.id}`, err);
+            throw err;
         }
-        console.log(`[${this.id}] ${this.title} => ${this.status}, result:`, this.result);
     }    
 }

@@ -97,6 +97,7 @@ enum ModuleType {
   TEXT
   CHART
   MD
+  QUIZ
 }
 
 model Quiz {

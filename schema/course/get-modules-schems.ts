@@ -8,6 +8,7 @@ export const courseSchema = z.object({
             description: z.string(),
             prerequisites: z.array(z.string()).optional(),
             difficulty: z.enum(['Beginner', 'Intermediate', 'Advanced']).optional(),
+            type: z.enum(['TEXT', 'VIDEO', 'MD', 'QUIZ'])
         })
     ),
 });

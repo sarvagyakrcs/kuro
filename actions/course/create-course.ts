@@ -1,119 +1,104 @@
 "use server";
 
+import { Event } from "@/models/Event";
+import { EventOrchestrator } from "@/models/EventOrchestrator";
+import { authEvent } from "@/lib/events/auth/auth-server";
+import { validateDataEvent } from "@/lib/events/course/create-course/validate-data";
+import { createDbCourseEvent, createUserCourseEvent } from "@/lib/events/course/create-course/create-db-course";
+import { uploadNotesEvent } from "@/lib/events/course/create-course/upload-notes";
+import { createAiModulesEvent } from "@/lib/events/course/create-course/create-ai-modules";
+import { uploadModulesToDBEvent } from "@/lib/events/course/create-course/upload-modules-to-ai";
+import { z } from "zod";
+import { createCourseSchema } from "@/schema/course/create-course-schema";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
-import { uploader } from "@/lib/s3";
-import { createCourseSchema } from "@/schema/course/create-course-schema";
-import { generateObject } from "ai";
-import { groq } from "@ai-sdk/groq";
-import { courseSchema } from "@/schema/course/get-modules-schems";
-import { getCourseModulesUsingAi } from "@/scripts/test/ai";
-import { z } from "zod";
 
-export async function createCourseEntry(formData: any) {
-    const session = await auth();
+// steps : 
+// 1. authenticate the user
+// 2. Valide the form data
+// 3. create the course
+// 4. create the userCourse
+// 5. upload the notes
+// 6. create ai modules (parallel with uploading the notes)
+// 7. upload the modules to the database
 
-    if (!session?.user) {
-        throw new Error("Unauthorized");
-    }
-
+export async function createCourseEntry(formData: z.infer<typeof createCourseSchema>) {
     try {
-        const {
-            success,
-            data,
-            error
-        } = createCourseSchema.safeParse({
-            name: formData.name,
-            mainOutcome: formData.mainOutcome,
-            currentLevel: formData.currentLevel,
-            notes: formData.notes
-        });
+        // USING EVENT ORCHESTRATOR
+        // Override the task functions to include the necessary parameters
+        const validateFn = validateDataEvent.task;
+        validateDataEvent.task = async () => await validateFn(formData);
 
-        if (!success) {
-            console.error("Form validation failed:", error);
-            throw new Error("Invalid form data");
-        }
+        const createDbCourseFn = createDbCourseEvent.task;
+        createDbCourseEvent.task = async () => {
+            const data = validateDataEvent.result;
+            return await createDbCourseFn(data);
+        };
 
-        const course = await prisma.course.create({
-            data: {
-                name: data.name,
-                outcome: data.mainOutcome,
-                currentLevel: data.currentLevel,
-            }
-        });
+        const createUserCourseFn = createUserCourseEvent.task;
+        createUserCourseEvent.task = async () => {
+            const user = authEvent.result;
+            const course = createDbCourseEvent.result;
+            return await createUserCourseFn({ courseId: course.id, userId: user.id });
+        };
 
-        const userCourse = await prisma.userCourse.create({
-            data: {
-                userId: session.user.id!,
-                courseId: course.id,
-            }
-        });
+        const uploadNotesFn = uploadNotesEvent.task;
+        uploadNotesEvent.task = async () => {
+            const user = authEvent.result;
+            const course = createDbCourseEvent.result;
+            return await uploadNotesFn({ notes: formData.notes, courseId: course.id, userId: user.id });
+        };
 
-        let attachments: { url: string; name: string; fileKey: string; contentType: string }[] = [];
+        const createAiModulesFn = createAiModulesEvent.task;
+        createAiModulesEvent.task = async () => {
+            const course = createDbCourseEvent.result;
+            return await createAiModulesFn({
+                name: course.name,
+                currentLevel: course.currentLevel || "",
+                mainOutcome: course.outcome || ""
+            });
+        };
 
-        if (data.notes && Array.isArray(data.notes)) {
-            for (const file of data.notes) {
-                try {
-                    const fileKey = uploader.generateUniqueFileKey(file.name, `courses/${course.id}/notes`);
-                    const uploadResult = await uploader.uploadBrowserFile(fileKey, file, {
-                        isPublic: true,
-                        metadata: {
-                            courseId: course.id,
-                            userId: session.user.id!,
-                        }
-                    });
+        const uploadModulesToDBFn = uploadModulesToDBEvent.task;
+        uploadModulesToDBEvent.task = async () => {
+            const user = authEvent.result;
+            const course = createDbCourseEvent.result;
+            const aiModules = createAiModulesEvent.result;
+            
+            return await uploadModulesToDBFn({ 
+                aiModules, 
+                courseId: course.id, 
+                userId: user.id 
+            });
+        };
 
-                    if (uploadResult.success) {
-                        const attachment = await prisma.courseAttachment.create({
-                            data: {
-                                courseId: course.id,
-                                name: file.name,
-                                url: uploadResult.publicUrl || fileKey,
-                                key: fileKey,
-                                contentType: file.type
-                            }
-                        });
+        // Create the adjacency list for the orchestrator
+        const adjList = new Map<Event, Event[]>();
+        adjList.set(authEvent, [validateDataEvent]);
+        adjList.set(validateDataEvent, [createDbCourseEvent]);
+        adjList.set(createDbCourseEvent, [createUserCourseEvent, uploadNotesEvent, createAiModulesEvent]);
+        adjList.set(createUserCourseEvent, []);
+        adjList.set(uploadNotesEvent, []);
+        adjList.set(createAiModulesEvent, [uploadModulesToDBEvent]);
+        adjList.set(uploadModulesToDBEvent, []);
 
-                        attachments.push({
-                            name: file.name,
-                            url: uploadResult.publicUrl || fileKey,
-                            fileKey,
-                            contentType: file.type
-                        });
-                    }
-                } catch (error) {
-                    console.error("Error uploading file:", file.name, error);
-                }
-            }
-        }
+        // Create and run the orchestrator
+        const orchestrator = new EventOrchestrator(adjList);
+        await orchestrator.run();
 
-        const result = await getCourseModulesUsingAi({
-            name: data.name,
-            currentLevel: data.currentLevel,
-            mainOutcome: data.mainOutcome
-        });
-
-        const typedResult = result as unknown as z.infer<typeof courseSchema>;
-
-        await prisma.module.createMany({
-            data: typedResult.subtopics.map((subtopic: { title: string; description: string }, index: number) => ({
-                name: subtopic.title,
-                description: subtopic.description,
-                courseId: course.id,
-                order: index,
-                moduleType: "MD"
-            }))
-        })
-
+        // Return the created course
         return {
             success: true,
             data: {
-                course,
-                userCourse,
-                attachments
+                course: createDbCourseEvent.result,
+                userCourse: createUserCourseEvent.result,
+                aiModules: createAiModulesEvent.result ? {
+                    name: createAiModulesEvent.result.name,
+                    subtopics: createAiModulesEvent.result.subtopics
+                } : null,
+                modulesCount: uploadModulesToDBEvent.result?.count || 0
             }
         };
-
     } catch (error) {
         console.error("Error in createCourseEntry:", error);
         throw error;

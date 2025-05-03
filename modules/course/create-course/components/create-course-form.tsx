@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 import { createCourseSchema } from "@/schema/course/create-course-schema";
 import { useMutation } from "@tanstack/react-query";
 import { uploadCourseWithFiles } from "@/actions/course/upload-course";
+import { createCourseEntry } from "@/actions/course/create-course";
 
 // Constants
 const MAX_FILES = 5;
@@ -70,9 +71,9 @@ export default function CourseForm({ courseName }: { courseName: string }) {
   });
 
   const { mutate: createCourse, isPending } = useMutation({
-    mutationFn: uploadCourseWithFiles,
+    mutationFn: createCourseEntry,
     onSuccess: () => {
-      toast.success("Course created successfully!", {
+      toast.success("Course created successfully with AI modules!", {
         id: "create-course",
       });
       router.push("/home");
