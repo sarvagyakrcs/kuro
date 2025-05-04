@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { IconLink } from '../components/icon-link'
-import { Logo } from '@/components/global/logo'
+import Logo from '@/components/global/logo'
 
 function BookIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   return (

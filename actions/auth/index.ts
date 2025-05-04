@@ -21,17 +21,16 @@ export const signInProvider = async (provider: 'google' | 'github' | 'twitter' |
         await signIn(provider);
     } catch (error) {
         if(error instanceof AuthError){
-            switch (error.type) {
-                case "CredentialsSignin":
-                    throw new Error("Incorrect Username or Password!")
-
-                    case "UntrustedHost":
-                        throw new Error("Untrusted host")
-                    case "AccessDenied":
-                        throw new Error("Please Verify Your Email to Login.")
-            
-                default:
-                    throw new Error("Something Went Wrong!")
+            // Handle different auth error scenarios without using error.type
+            const errorMessage = error.message || "Something Went Wrong!";
+            if (errorMessage.includes("CredentialsSignin")) {
+                throw new Error("Incorrect Username or Password!");
+            } else if (errorMessage.includes("UntrustedHost")) {
+                throw new Error("Untrusted host");
+            } else if (errorMessage.includes("AccessDenied")) {
+                throw new Error("Please Verify Your Email to Login.");
+            } else {
+                throw new Error("Something Went Wrong!");
             }
         }
         throw error;
@@ -81,17 +80,16 @@ export const Login = async (credentials : z.infer<typeof LoginSchema>) => {
         })
     } catch (error) {
         if(error instanceof AuthError){
-            switch (error.type) {
-                case "CredentialsSignin":
-                    throw new Error("Incorrect Username or Password!")
-
-                    case "UntrustedHost":
-                        throw new Error("Untrusted host")
-                    case "AccessDenied":
-                        throw new Error("Please Verify Your Email to Login.")
-            
-                default:
-                    throw new Error("Something Went Wrong!")
+            // Handle different auth error scenarios without using error.type
+            const errorMessage = error.message || "Something Went Wrong!";
+            if (errorMessage.includes("CredentialsSignin")) {
+                throw new Error("Incorrect Username or Password!");
+            } else if (errorMessage.includes("UntrustedHost")) {
+                throw new Error("Untrusted host");
+            } else if (errorMessage.includes("AccessDenied")) {
+                throw new Error("Please Verify Your Email to Login.");
+            } else {
+                throw new Error("Something Went Wrong!");
             }
         }
         throw error;

@@ -25,12 +25,11 @@ import { Divider } from "@/components/ui/divider";
 import { useRouter } from "next/navigation";
 import { createCourseSchema } from "@/schema/course/create-course-schema";
 import { useMutation } from "@tanstack/react-query";
-import { uploadCourseWithFiles } from "@/actions/course/upload-course";
 import { createCourseEntry } from "@/actions/course/create-course";
 
 // Constants
 const MAX_FILES = 5;
-const MAX_FILE_SIZE = 1024 * 1024 * 4; // 4MB
+const MAX_FILE_SIZE = 1024 * 1024 * 9; // 9MB
 const ALLOWED_FILE_TYPES = {
   "documents/*": [".pdf", ".doc", ".docx", ".txt", ".md"],
   "images/*": [".jpg", ".jpeg", ".png", ".gif", ".svg"],

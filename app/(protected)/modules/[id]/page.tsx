@@ -8,9 +8,7 @@ import { Module, ModuleType } from '@prisma/client'
 import React from 'react'
 
 type Props = {
-    params: {
-        id: string
-    }
+    params: Promise<{ id: string }>
 }
 
 const renderModule = (module: Module) => {

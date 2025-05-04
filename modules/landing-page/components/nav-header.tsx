@@ -16,8 +16,9 @@ const Header = ({ session } : {session : Session | null}) => {
   const categories = [
     "About us",  
     "Contact us",  
-    "Working",  
-];
+    "Working",
+    "Documentation"  
+  ];
   
   return (
     <>
@@ -32,7 +33,7 @@ const Header = ({ session } : {session : Session | null}) => {
             {/* Categories - Hidden on mobile */}
             <NavbarSection className="hidden md:flex">
               {categories.map((category, index) => (
-                <NavbarItem key={index} href={`/category/${category.toLowerCase().replace(/\s+/g, '-')}`}>
+                <NavbarItem key={index} href={category.toLowerCase() === "documentation" ? "/documentation" : `/category/${category.toLowerCase().replace(/\s+/g, '-')}`}>
                   <NavbarLabel className='text-black'>{category}</NavbarLabel>
                 </NavbarItem>
               ))}
@@ -78,7 +79,7 @@ const Header = ({ session } : {session : Session | null}) => {
               {categories.map((category, index) => (
                 <li key={index}>
                   <Link 
-                    href={`/category/${category.toLowerCase().replace(/\s+/g, '-')}`}
+                    href={category.toLowerCase() === "documentation" ? "/documentation" : `/category/${category.toLowerCase().replace(/\s+/g, '-')}`}
                     className="block py-2 text-lg font-medium"
                   >
                     {category}

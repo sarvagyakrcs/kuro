@@ -4,9 +4,7 @@ import CourseList from '@/modules/course/course-detail/components/course-list'
 import React from 'react'
 
 type Props = {
-    params: {
-        id: string
-    }
+    params: Promise<{ id: string }>
 }
 
 const CourseDetailPage = async ({ params }: Props) => {
