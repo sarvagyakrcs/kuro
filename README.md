@@ -4,6 +4,16 @@ A modern web application for generating and managing AI educational courses, bui
 
 ![Landing Page](public/demo/landing-page.png)
 
+## Live Demo
+
+**URL**: [kuro-main.vercel.app](https://kuro-main.vercel.app)
+
+**Test Credentials**:
+- Email: test@kuro.com
+- Password: password@123
+
+> **⚠️ Important**: The application uses third-party AI APIs with rate limits. If you encounter errors during course generation or other AI-powered features, this may be due to API quotas being exceeded. Please use the test features sparingly.
+
 ## Overview
 
 AI Course Generator is a powerful platform that leverages AI to help create, manage, and deliver educational content. The application features authentication, course creation workflows, content management, and more.
@@ -129,6 +139,9 @@ Secure authentication using NextAuth v5 with:
 
 - Node.js 18+ or Bun
 - A database (PostgreSQL recommended)
+- API keys for AI services (see Environment Variables)
+
+> **Note**: For local development, you'll need your own API keys. The test credentials provided above are for the demo site only and have limited usage quotas.
 
 ### Installation
 
@@ -171,7 +184,6 @@ R2_SECRET_ACCESS_KEY=""
 R2_BUCKET_NAME=""
 R2_PUBLIC_URL=""
 ```
-
 4. Initialize the database:
 
 ```bash
@@ -232,3 +244,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - Built with Next.js and Tailwind CSS
 - Leverages various AI technologies for content generation
+
